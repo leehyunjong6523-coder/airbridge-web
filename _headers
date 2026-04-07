@@ -1,0 +1,14 @@
+# Cloudflare Pages Custom Headers
+# 에어브리지 국제특송
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cache-Control: public, max-age=0, must-revalidate
+
+/style.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/common.js
+  Cache-Control: public, max-age=31536000, immutable

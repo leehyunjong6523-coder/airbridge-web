@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에어브리지 국제특송 — 운임 계산기</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d1117;
+  --surface:  #161b27;
+  --surface2: #1e2535;
+  --border:   #2a3347;
+  --border2:  #374460;
+  --text:     #e2e8f0;
+  --muted:    #7a8ba8;
+  --muted2:   #4a5a78;
+  --cyan:     #22d3ee;
+  --cyan-dim: #0e7490;
+  --purple:   #a78bfa;
+  --amber:    #fbbf24;
+  --red:      #f87171;
+  --green:    #34d399;
+  --dhl-col:  #ef4444;
+  --fedex-col:#a855f7;
+  --ups-col:  #f97316;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'Noto Sans KR', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.old-header-disabled {
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #111827 0%, var(--bg) 100%);
+  padding: 0 32px;
+}
+.old-header-inner-disabled {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900;
+  font-family: var(--mono);
+  color: #fff;
+}
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.logo-sub  { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: -2px; }
+.header-info {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+  font-family: var(--mono);
+}
+.header-info span { color: var(--cyan); }
+
+/* ── LAYOUT ── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 32px 80px;
+}
+
+/* ── SECTION TITLE ── */
+.section-label {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 14px;
+  background: var(--cyan);
+  border-radius: 2px;
+}
+
+/* ── FORM GRID ── */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.form-control {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-control:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.08);
+}
+select.form-control option { background: var(--surface); }
+
+/* ── TOGGLE ── */
+.toggle-group {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.toggle-btn.active {
+  background: var(--cyan-dim);
+  color: #fff;
+}
+
+/* ── CT TABLE ── */
+.ct-table { width: 100%; border-collapse: collapse; }
+.ct-table th {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.ct-table td { padding: 6px 4px; }
+.ct-table td input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: var(--mono);
+  width: 100%;
+  outline: none;
+  text-align: right;
+  transition: border-color 0.2s;
+}
+.ct-table td input:focus { border-color: var(--cyan-dim); }
+.ct-vol {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+  padding: 0 10px;
+}
+.btn-del {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  border-radius: 6px;
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-del:hover { border-color: var(--red); color: var(--red); }
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--sans);
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+.btn-add:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ── DISCOUNT GRID ── */
+.disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.disc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.disc-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  display: flex; align-items: center; gap: 6px;
+}
+.disc-badge {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.disc-dhl   { background: var(--dhl-col); }
+.disc-fedex { background: var(--fedex-col); }
+.disc-ups   { background: var(--ups-col); }
+.disc-input-wrap { position: relative; }
+.disc-input-wrap input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 32px 10px 14px;
+  font-size: 14px;
+  font-family: var(--mono);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+  text-align: right;
+}
+.disc-input-wrap input:focus { border-color: var(--cyan-dim); }
+.disc-unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--muted2);
+  font-family: var(--mono);
+  pointer-events: none;
+}
+
+/* ── REMOTE AREA ── */
+.remote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── CALC BUTTON ── */
+.btn-calc {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--cyan-dim) 0%, #1e40af 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--sans);
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-calc:hover  { opacity: 0.9; }
+.btn-calc:active { transform: scale(0.99); }
+.btn-calc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+.btn-calc:hover::after { transform: translateX(100%); }
+
+/* ── FUEL DISPLAY ── */
+.fuel-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.fuel-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.fuel-chip .fc-label { color: var(--muted); }
+.fuel-chip .fc-val   { color: var(--amber); font-weight: 600; }
+
+/* ── RESULTS ── */
+#results { display: none; }
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.results-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.results-sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.wt-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.wt-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.wt-chip .wc-label { font-size: 10px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.8px; }
+.wt-chip .wc-val   { font-size: 16px; font-weight: 700; font-family: var(--mono); color: var(--cyan); }
+.wt-chip .wc-unit  { font-size: 11px; color: var(--muted2); font-family: var(--mono); }
+
+/* ── CARRIER CARDS ── */
+.carrier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.carrier-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.carrier-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.carrier-card.best-price {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green), 0 0 24px rgba(52,211,153,0.1);
+}
+.carrier-card.no-service {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.cc-header {
+  padding: 16px 20px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.cc-name {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cc-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.cc-zone {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.best-badge {
+  font-size: 10px;
+  background: var(--green);
+  color: #000;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+.cc-body { padding: 16px 20px; }
+.cc-price {
+  font-size: 26px;
+  font-weight: 900;
+  font-family: var(--mono);
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.cc-price-detail {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-bottom: 12px;
+}
+.cc-rows { display: flex; flex-direction: column; gap: 6px; }
+.cc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+.cc-row .cr-val {
+  font-family: var(--mono);
+  color: var(--text);
+}
+.cc-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 10px 0;
+}
+.cc-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.cc-total-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.cc-total-val {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.cc-surs { margin-top: 10px; display: flex; flex-direction: column; gap: 3px; }
+.cc-sur-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 2px 0;
+}
+.cc-sur-item .cs-val { font-family: var(--mono); color: var(--amber); }
+.cc-notice {
+  font-size: 11px;
+  color: var(--amber);
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: rgba(251,191,36,0.07);
+  border-radius: 6px;
+  border-left: 2px solid var(--amber);
+}
+.cc-days {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 8px;
+}
+
+/* ── DISCLAIMER ── */
+.disclaimer {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.disclaimer strong { color: var(--text); }
+
+/* ── DHL COLOR ── */
+.dhl-card   .cc-dot  { background: var(--dhl-col); }
+.dhl-card   .cc-name { color: var(--dhl-col); }
+.dhl-card   .cc-price { color: var(--dhl-col); }
+.dhl-card   .cc-total-val { color: var(--dhl-col); }
+
+.fedex-card .cc-dot  { background: var(--fedex-col); }
+.fedex-card .cc-name { color: var(--fedex-col); }
+.fedex-card .cc-price { color: var(--fedex-col); }
+.fedex-card .cc-total-val { color: var(--fedex-col); }
+
+.ups-card   .cc-dot  { background: var(--ups-col); }
+.fedex-e-card .cc-dot  { background: #c084fc; }
+.fedex-e-card .cc-name { color: #c084fc; }
+.fedex-e-card .cc-price { color: #c084fc; }
+.fedex-e-card .cc-total-val { color: #c084fc; }
+.ups-card   .cc-name { color: var(--ups-col); }
+.ups-card   .cc-price { color: var(--ups-col); }
+.ups-card   .cc-total-val { color: var(--ups-col); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .container { padding: 20px 16px 60px; }
+  .old-header-disabled { padding: 0 16px; }
+  .header-info { display: none; }
+  .carrier-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .remote-grid { grid-template-columns: 1fr; }
+}
+
+/* ── LOADING ── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 20px 0;
+  justify-content: center;
+}
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SCROLL ANIMATE ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+.carrier-card { opacity: 0; }
+.carrier-card.fade-up { opacity: 1; }
+
+/* ── NOTE BADGE ── */
+.note-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+}
+</style>
+</head>
+<body>
+<div class="page-wrap" style="padding-top:var(--nav-h);">
+
+<!-- HEADER (replaced by common.js) -->
+<!-- nav injected by common.js -->
+
+<div class="container">
+
+  <!-- 유류할증료 -->
+  <div style="margin-bottom:24px;">
+    <div class="section-label">현재 유류할증료</div>
+    <div class="fuel-row">
+      <div class="fuel-chip"><span class="fc-label">DHL</span><span class="fc-val" id="fuel-dhl-disp">39.0%</span></div>
+      <div class="fuel-chip"><span class="fc-label">FedEx</span><span class="fc-val" id="fuel-fedex-disp">46.25%</span></div>
+      <div class="fuel-chip"><span class="fc-label">UPS</span><span class="fc-val" id="fuel-ups-disp">46.25%</span></div>
+      <div class="note-badge">📅 <span id="fuel-date">2026-03-31</span> 기준</div>
+    </div>
+  </div>
+
+  <!-- 기본 정보 -->
+  <div class="card">
+    <div class="card-title">기본 정보</div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column: span 2;">
+        <label class="form-label">목적지 국가</label>
+        <select class="form-control" id="dest-country">
+          <option value="">국가를 선택하세요</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">수출 / 수입</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="btn-export" onclick="setMode('수출')">수출 ✈️</button>
+          <button class="toggle-btn" id="btn-import" onclick="setMode('수입')">수입 📦</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">화물 종류</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="btn-doc" onclick="setDocType(true)">서류 📄</button>
+          <button class="toggle-btn active" id="btn-ndc" onclick="setDocType(false)">물품 📦</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C/T 정보 -->
+  <div class="card">
+    <div class="card-title">화물 정보 (C/T)</div>
+    <table class="ct-table">
+      <thead>
+        <tr>
+          <th>수량</th>
+          <th>실중량 (kg)</th>
+          <th>가로 L (cm)</th>
+          <th>세로 W (cm)</th>
+          <th>높이 H (cm)</th>
+          <th>부피중량</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="ct-tbody"></tbody>
+    </table>
+    <button class="btn-add" onclick="addCT()">＋ C/T 추가</button>
+  </div>
+
+  <!-- 할인율 -->
+  <div class="card">
+    <div class="card-title">할인율 입력</div>
+    <div class="disc-grid" id="disc-grid">
+      <div class="disc-item">
+        <div class="disc-label"><span class="disc-badge disc-dhl"></span>DHL Express</div>
+        <div class="disc-input-wrap">
+          <input type="number" id="disc-dhl" value="0" min="0" max="80" step="0.5">
+          <span class="disc-unit">%</span>
+        </div>
+      </div>
+      <div class="disc-item">
+        <div class="disc-label"><span class="disc-badge disc-fedex"></span>FedEx IP</div>
+        <div class="disc-input-wrap">
+          <input type="number" id="disc-fedex" value="0" min="0" max="80" step="0.5">
+          <span class="disc-unit">%</span>
+        </div>
+      </div>
+      <div class="disc-item">
+        <div class="disc-label"><span class="disc-badge" style="background:#c084fc;"></span>FedEx Economy</div>
+        <div class="disc-input-wrap">
+          <input type="number" id="disc-fedex-e" value="0" min="0" max="80" step="0.5">
+          <span class="disc-unit">%</span>
+        </div>
+      </div>
+      <div class="disc-item">
+        <div class="disc-label"><span class="disc-badge disc-ups"></span>UPS Saver</div>
+        <div class="disc-input-wrap">
+          <input type="number" id="disc-ups" value="0" min="0" max="80" step="0.5">
+          <span class="disc-unit">%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 외곽지역 -->
+  <div class="card">
+    <div class="card-title">외곽지역 조회 <span style="font-size:11px;color:var(--muted);font-weight:400;">(선택입력 — DHL Remote Area 해당 시 수수료 추가)</span></div>
+    <div class="remote-grid">
+      <div class="form-group">
+        <label class="form-label">우편번호</label>
+        <input type="text" class="form-control" id="remote-postal" placeholder="예: 80331">
+      </div>
+      <div class="form-group">
+        <label class="form-label">도시명</label>
+        <input type="text" class="form-control" id="remote-city" placeholder="예: Munich">
+      </div>
+    </div>
+  </div>
+
+  <!-- 계산 버튼 -->
+  <button class="btn-calc" onclick="calculate()">운임 계산하기</button>
+
+  <!-- 결과 -->
+  <div id="results" style="margin-top:36px;">
+    <div class="results-header">
+      <div>
+        <div class="results-title" id="res-title">운임 조회 결과</div>
+        <div class="results-sub" id="res-sub"></div>
+      </div>
+    </div>
+    <div class="wt-summary" id="wt-summary"></div>
+    <div class="carrier-grid" id="carrier-grid"></div>
+    <div class="disclaimer">
+      <strong>안내사항</strong><br>
+      본 계산기는 예상 운임 참고용이며, 실제 청구 금액은 화물 실측·운송사 정책·서비스 조건에 따라 달라질 수 있습니다.<br>
+      정확한 견적은 에어브리지 고객센터(032-502-1880 / <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d6e7e4d6c647f627e236e6223667f">[email&#160;protected]</a>)로 문의해 주세요.
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let mode   = '수출';
+let isDoc  = false;
+let ctRows = [];
+let ctId   = 0;
+
+const FUEL = { dhl: 39.0, fedex: 46.25, ups: 46.25 };
+
+// ══════════════════════════════════════════════════════════
+// DATA: DHL
+// ══════════════════════════════════════════════════════════
+const DHL_ZONE_MAP = {"Albania":7,"Algeria":8,"American Samoa":8,"Andorra":6,"Angola":8,"Argentina":8,"Armenia":8,"Australia":4,"Austria":6,"Azerbaijan":8,"Bahamas":8,"Bahrain":7,"Bangladesh":4,"Belarus":8,"Belgium":6,"Belize":8,"Benin":8,"Bhutan":8,"Bolivia":8,"Brazil":8,"Brunei":3,"Bulgaria":6,"Burkina Faso":8,"Burundi":8,"Cambodia":3,"Cameroon":8,"Canada":5,"Chile":8,"China (People's Republic)":1,"Colombia":8,"Costa Rica":8,"Croatia":6,"Cuba":8,"Cyprus":6,"Czech Republic":6,"Denmark":6,"Dominican Republic":8,"Ecuador":8,"Egypt":8,"El Salvador":8,"Estonia":6,"Ethiopia":8,"Fiji":8,"Finland":6,"France":6,"Gabon":8,"Georgia":8,"Germany":6,"Ghana":8,"Greece":6,"Guatemala":8,"Guinea":8,"Haiti":8,"Honduras":8,"Hong Kong SAR China":1,"Hungary":6,"Iceland":8,"India":4,"Indonesia":3,"Iran, Islamic Rep. of":8,"Iraq":8,"Ireland":6,"Israel":7,"Italy":6,"Jamaica":8,"Japan":2,"Jordan":8,"Kazakhstan":8,"Kenya":8,"Kuwait":7,"Lao P.D.R.":3,"Latvia":6,"Lebanon":8,"Liechtenstein":6,"Lithuania":6,"Luxembourg":6,"Macau SAR China":1,"Madagascar":8,"Malaysia":3,"Maldives":8,"Malta":6,"Martinique":8,"Mauritius":8,"Mexico":5,"Moldova":8,"Monaco":6,"Mongolia":8,"Montenegro":7,"Morocco":8,"Mozambique":8,"Myanmar":3,"Namibia":8,"Nepal":8,"Netherlands":6,"New Zealand":4,"Nicaragua":8,"Niger":8,"Nigeria":8,"Norway":6,"Oman":7,"Pakistan":4,"Panama":8,"Papua New Guinea":4,"Paraguay":8,"Peru":8,"Philippines":3,"Poland":6,"Portugal":6,"Puerto Rico":8,"Qatar":7,"Romania":6,"Russia":8,"Rwanda":8,"Saudi Arabia":7,"Senegal":8,"Serbia":7,"Singapore":1,"Slovakia":6,"Slovenia":6,"South Africa":8,"Spain":6,"Sri Lanka":4,"Sudan":8,"Sweden":6,"Switzerland":6,"Syria":8,"Taiwan, China":1,"Tanzania":8,"Thailand":3,"Togo":8,"Trinidad and Tobago":8,"Tunisia":8,"Turkiye":7,"Uganda":8,"Ukraine":8,"United Arab Emirates":7,"United Kingdom":6,"United States of America":5,"Uruguay":8,"Uzbekistan":8,"Venezuela":8,"Vietnam":3,"Yemen":8,"Zambia":8,"Zimbabwe":8};
+
+const COUNTRY_KR = {"Albania":"알바니아","Algeria":"알제리","American Samoa":"아메리칸사모아","Andorra":"안도라","Angola":"앙골라","Argentina":"아르헨티나","Armenia":"아르메니아","Australia":"호주","Austria":"오스트리아","Azerbaijan":"아제르바이잔","Bahamas":"바하마","Bahrain":"바레인","Bangladesh":"방글라데시","Belarus":"벨라루스","Belgium":"벨기에","Belize":"벨리즈","Benin":"베냉","Bhutan":"부탄","Bolivia":"볼리비아","Brazil":"브라질","Brunei":"브루나이","Bulgaria":"불가리아","Burkina Faso":"부르키나파소","Burundi":"부룬디","Cambodia":"캄보디아","Cameroon":"카메룬","Canada":"캐나다","Chile":"칠레","China (People's Republic)":"중국","Colombia":"콜롬비아","Costa Rica":"코스타리카","Croatia":"크로아티아","Cuba":"쿠바","Cyprus":"키프로스","Czech Republic":"체코","Denmark":"덴마크","Dominican Republic":"도미니카공화국","Ecuador":"에콰도르","Egypt":"이집트","El Salvador":"엘살바도르","Estonia":"에스토니아","Ethiopia":"에티오피아","Fiji":"피지","Finland":"핀란드","France":"프랑스","Gabon":"가봉","Georgia":"조지아","Germany":"독일","Ghana":"가나","Greece":"그리스","Guatemala":"과테말라","Guinea":"기니","Haiti":"아이티","Honduras":"온두라스","Hong Kong SAR China":"홍콩","Hungary":"헝가리","Iceland":"아이슬란드","India":"인도","Indonesia":"인도네시아","Iran, Islamic Rep. of":"이란","Iraq":"이라크","Ireland":"아일랜드","Israel":"이스라엘","Italy":"이탈리아","Jamaica":"자메이카","Japan":"일본","Jordan":"요르단","Kazakhstan":"카자흐스탄","Kenya":"케냐","Kuwait":"쿠웨이트","Lao P.D.R.":"라오스","Latvia":"라트비아","Lebanon":"레바논","Liechtenstein":"리히텐슈타인","Lithuania":"리투아니아","Luxembourg":"룩셈부르크","Macau SAR China":"마카오","Madagascar":"마다가스카르","Malaysia":"말레이시아","Maldives":"몰디브","Malta":"몰타","Martinique":"마르티니크","Mauritius":"모리셔스","Mexico":"멕시코","Moldova":"몰도바","Monaco":"모나코","Mongolia":"몽골","Montenegro":"몬테네그로","Morocco":"모로코","Mozambique":"모잠비크","Myanmar":"미얀마","Namibia":"나미비아","Nepal":"네팔","Netherlands":"네덜란드","New Zealand":"뉴질랜드","Nicaragua":"니카라과","Niger":"니제르","Nigeria":"나이지리아","Norway":"노르웨이","Oman":"오만","Pakistan":"파키스탄","Panama":"파나마","Papua New Guinea":"파푸아뉴기니","Paraguay":"파라과이","Peru":"페루","Philippines":"필리핀","Poland":"폴란드","Portugal":"포르투갈","Puerto Rico":"푸에르토리코","Qatar":"카타르","Romania":"루마니아","Russia":"러시아","Rwanda":"르완다","Saudi Arabia":"사우디아라비아","Senegal":"세네갈","Serbia":"세르비아","Singapore":"싱가포르","Slovakia":"슬로바키아","Slovenia":"슬로베니아","South Africa":"남아프리카공화국","Spain":"스페인","Sri Lanka":"스리랑카","Sudan":"수단","Sweden":"스웨덴","Switzerland":"스위스","Syria":"시리아","Taiwan, China":"대만","Tanzania":"탄자니아","Thailand":"태국","Togo":"토고","Trinidad and Tobago":"트리니다드토바고","Tunisia":"튀니지","Turkiye":"튀르키예","Uganda":"우간다","Ukraine":"우크라이나","United Arab Emirates":"아랍에미리트","United Kingdom":"영국","United States of America":"미국","Uruguay":"우루과이","Uzbekistan":"우즈베키스탄","Venezuela":"베네수엘라","Vietnam":"베트남","Yemen":"예멘","Zambia":"잠비아","Zimbabwe":"짐바브웨"};
+
+// DHL DOC 공시가 (Zone 1~8)
+const DHL_PUB_DOC = {0.5:[59000,62200,63100,73300,75700,81900,92000,108100],1.0:[88200,88600,93900,106400,108200,132500,145900,171400],1.5:[116100,121300,128600,140400,142400,176800,197000,236500],2.0:[144000,154000,163300,174400,176600,221100,248100,301600]};
+// DHL NDC 공시가 (Zone 1~8, 0.5~30kg)
+const DHL_PUB_NDC = {0.5:[140700,147300,148000,153600,155300,166800,175100,226900],1.0:[160300,167600,168300,175200,177100,203800,216900,275100],1.5:[170400,179700,184700,192900,194900,231900,251300,316000],2.0:[180500,191800,201100,210600,212700,260000,285700,356900],2.5:[190300,203900,217000,227200,229600,287400,319500,396100],3.0:[198100,214800,230900,243100,245500,310700,348700,432400],3.5:[205900,225700,244800,259000,261400,334000,377900,468700],4.0:[213700,236600,258700,274900,277300,357300,407100,505000],4.5:[221500,247500,272600,290800,293200,380600,436300,541300],5.0:[229300,258400,286500,306700,309100,403900,465500,577600],5.5:[236600,266500,299100,320600,323600,425100,492300,612500],6.0:[243900,274600,311700,334500,338100,446300,519100,647400],6.5:[251200,282700,324300,348400,352600,467500,545900,682300],7.0:[258500,290800,336900,362300,367100,488700,572700,717200],7.5:[265800,298900,349500,376200,381600,509900,599500,752100],8.0:[273100,307000,362100,390100,396100,531100,626300,787000],8.5:[280400,315100,374700,404000,410600,552300,653100,821900],9.0:[287700,323200,387300,417900,425100,573500,679900,856800],9.5:[295000,331300,399900,431800,439600,594700,706700,891700],10.0:[302300,339400,412500,445700,454100,615900,733500,926600],10.5:[309300,346300,421700,456900,465100,636500,758500,959100],11.0:[316300,353200,430900,468100,476100,657100,783500,991600],11.5:[323300,360100,440100,479300,487100,677700,808500,1024100],12.0:[330300,367000,449300,490500,498100,698300,833500,1056600],12.5:[337300,373900,458500,501700,509100,718900,858500,1089100],13.0:[344300,380800,467700,512900,520100,739500,883500,1121600],13.5:[351300,387700,476900,524100,531100,760100,908500,1154100],14.0:[358300,394600,486100,535300,542100,780700,933500,1186600],14.5:[365300,401500,495300,546500,553100,801300,958500,1219100],15.0:[372300,408400,504500,557700,564100,821900,983500,1251600],15.5:[379300,415300,513700,568900,575100,842500,1008500,1284100],16.0:[386300,422200,522900,580100,586100,863100,1033500,1316600],16.5:[393300,429100,532100,591300,597100,883700,1058500,1349100],17.0:[400300,436000,541300,602500,608100,904300,1083500,1381600],17.5:[407300,442900,550500,613700,619100,924900,1108500,1414100],18.0:[414300,449800,559700,624900,630100,945500,1133500,1446600],18.5:[421300,456700,568900,636100,641100,966100,1158500,1479100],19.0:[428300,463600,578100,647300,652100,986700,1183500,1511600],19.5:[435300,470500,587300,658500,663100,1007300,1208500,1544100],20.0:[442300,477400,596500,669700,674100,1027900,1233500,1576600],20.5:[451700,487700,609300,684000,689300,1050700,1258100,1608400],21.0:[461100,498000,622100,698300,704500,1073500,1282700,1640200],21.5:[470500,508300,634900,712600,719700,1096300,1307300,1672000],22.0:[479900,518600,647700,726900,734900,1119100,1331900,1703800],22.5:[489300,528900,660500,741200,750100,1141900,1356500,1735600],23.0:[498700,539200,673300,755500,765300,1164700,1381100,1767400],23.5:[508100,549500,686100,769800,780500,1187500,1405700,1799200],24.0:[517500,559800,698900,784100,795700,1210300,1430300,1831000],24.5:[526900,570100,711700,798400,810900,1233100,1454900,1862800],25.0:[536300,580400,724500,812700,826100,1255900,1479500,1894600],25.5:[545700,590700,737300,827000,841300,1278700,1504100,1926400],26.0:[555100,601000,750100,841300,856500,1301500,1528700,1958200],26.5:[564500,611300,762900,855600,871700,1324300,1553300,1990000],27.0:[573900,621600,775700,869900,886900,1347100,1577900,2021800],27.5:[583300,631900,788500,884200,902100,1369900,1602500,2053600],28.0:[592700,642200,801300,898500,917300,1392700,1627100,2085400],28.5:[602100,652500,814100,912800,932500,1415500,1651700,2117200],29.0:[611500,662800,826900,927100,947700,1438300,1676300,2149000],29.5:[620900,673100,839700,941400,962900,1461100,1700900,2180800],30.0:[630300,683400,852500,955700,978100,1483900,1725500,2212600]};
+const DHL_PUB_OVER = {"30.1-70":[20400,22100,27700,31900,32900,49500,55900,71600],"70.1-300":[20400,22100,27700,31900,32900,49500,55900,71600],"300.1+":[20400,22100,27700,31900,32900,49500,55900,71600]};
+
+// DHL 수입
+const DHL_IMP_DOX = {0.5:[67900,71600,72500,84300,87000,94200,105900,124200],1.0:[101500,102000,108000,122400,124300,152400,167800,197000],1.5:[133600,139500,147900,161400,163700,203500,226600,271800],2.0:[165700,177000,187800,200400,203100,254600,285400,346600]};
+const DHL_IMP_NDC = {0.5:[161800,169400,170100,176700,178600,191800,201400,260900],1.0:[184400,192700,193400,201500,203700,234400,249400,316300],1.5:[196000,206700,212300,221700,224100,266700,289000,363300],2.0:[207600,220700,231200,241900,244500,299000,328600,410300],2.5:[219000,234600,249400,261000,263900,330500,367500,455400],3.0:[228000,247000,265500,279300,282300,357300,401100,497100],3.5:[237000,259400,281600,297600,300700,384100,434700,538800],4.0:[246000,271800,297700,315900,319100,410900,468300,580500],4.5:[255000,284200,313800,334200,337500,437700,501900,622200],5.0:[264000,296600,329900,352500,355900,464500,535500,663900],5.5:[272400,305700,344200,368400,372500,488900,566300,703900],6.0:[280800,314800,358500,384300,389100,513300,597100,743900],6.5:[289200,323900,372800,400200,405700,537700,627900,783900],7.0:[297600,333000,387100,416100,422300,562100,658700,823900],7.5:[306000,342100,401400,432000,438900,586500,689500,863900],8.0:[314400,351200,415700,447900,455500,610900,720300,903900],8.5:[322800,360300,430000,463800,472100,635300,751100,943900],9.0:[331200,369400,444300,479700,488700,659700,781900,983900],9.5:[339600,378500,458600,495600,505300,684100,812700,1023900],10.0:[348000,387600,472900,511500,521900,708500,843500,1063900],10.5:[356100,395900,483600,524400,534500,732200,872400,1101300],11.0:[364200,404200,494300,537300,547100,755900,901300,1138700],11.5:[372300,412500,505000,550200,559700,779600,930200,1176100],12.0:[380400,420800,515700,563100,572300,803300,959100,1213500],12.5:[388500,429100,526400,576000,584900,827000,988000,1250900],13.0:[396600,437400,537100,588900,597500,850700,1016900,1288300],13.5:[404700,445700,547800,601800,610100,874400,1045800,1325700],14.0:[412800,454000,558500,614700,622700,898100,1074700,1363100],14.5:[420900,462300,569200,627600,635300,921800,1103600,1400500],15.0:[429000,470600,579900,640500,647900,945500,1132500,1437900],15.5:[437100,478900,590600,653400,660500,969200,1161400,1475300],16.0:[445200,487200,601300,666300,673100,992900,1190300,1512700],16.5:[453300,495500,612000,679200,685700,1016600,1219200,1550100],17.0:[461400,503800,622700,692100,698300,1040300,1248100,1587500],17.5:[469500,512100,633400,705000,710900,1064000,1277000,1624900],18.0:[477600,520400,644100,717900,723500,1087700,1305900,1662300],18.5:[485700,528700,654800,730800,736100,1111400,1334800,1699700],19.0:[493800,537000,665500,743700,748700,1135100,1363700,1737100],19.5:[501900,545300,676200,756600,761300,1158800,1392600,1774500],20.0:[510000,553600,686900,769500,773900,1182500,1421500,1811900],20.5:[520800,565200,701700,786100,791500,1208800,1449700,1848500],21.0:[531600,576800,716500,802700,809100,1235100,1477900,1885100],21.5:[542400,588400,731300,819300,826700,1261400,1506100,1921700],22.0:[553200,600000,746100,835900,844300,1287700,1534300,1958300],22.5:[564000,611600,760900,852500,861900,1314000,1562500,1994900],23.0:[574800,623200,775700,869100,879500,1340300,1590700,2031500],23.5:[585600,634800,790500,885700,897100,1366600,1618900,2068100],24.0:[596400,646400,805300,902300,914700,1392900,1647100,2104700],24.5:[607200,658000,820100,918900,932300,1419200,1675300,2141300],25.0:[618000,669600,834900,935500,949900,1445500,1703500,2177900],25.5:[628800,681200,849700,952100,967500,1471800,1731700,2214500],26.0:[639600,692800,864500,968700,985100,1498100,1759900,2251100],26.5:[650400,704400,879300,985300,1002700,1524400,1788100,2287700],27.0:[661200,716000,894100,1001900,1020300,1550700,1816300,2324300],27.5:[672000,727600,908900,1018500,1037900,1577000,1844500,2360900],28.0:[682800,739200,923700,1035100,1055500,1603300,1872700,2397500],28.5:[693600,750800,938500,1051700,1073100,1629600,1900900,2434100],29.0:[704400,762400,953300,1068300,1090700,1655900,1929100,2470700],29.5:[715200,774000,968100,1084900,1108300,1682200,1957300,2507300],30.0:[726000,785600,982900,1101500,1125900,1708500,1985500,2543900]};
+const DHL_IMP_OVER = {"30-70":[23700,25500,31800,37100,38000,56900,64300,82300],"70-300":[23700,25500,31800,37100,38000,56900,64300,82300],"300+":[23700,25500,31800,37100,38000,56900,64300,82300]};
+
+// ══════════════════════════════════════════════════════════
+// DATA: FedEx
+// ══════════════════════════════════════════════════════════
+const FEDEX_ZONES_LIST = ["A","B","C","D","E","F","G","H","I","J"];
+const FEDEX_ZONE_MAP_EN = {"Hong Kong SAR China":"A","Taiwan, China":"A","Macau SAR China":"A","Singapore":"A","China (People's Republic)":"A","Japan":"B","Indonesia":"C","Malaysia":"C","Philippines":"C","Thailand":"C","Vietnam":"C","Brunei":"D","Cambodia":"D","India":"D","Lao P.D.R.":"D","Mongolia":"D","Myanmar":"D","Australia":"F","Canada":"F","Mexico":"F","New Zealand":"F","Puerto Rico":"F","United States of America":"F","Andorra":"G","Austria":"G","Belgium":"G","Bulgaria":"G","Czech Republic":"G","Denmark":"G","Estonia":"G","Finland":"G","France":"G","Germany":"G","Greece":"G","Hungary":"G","Ireland":"G","Italy":"G","Latvia":"G","Liechtenstein":"G","Lithuania":"G","Luxembourg":"G","Malta":"G","Monaco":"G","Netherlands":"G","Norway":"G","Poland":"G","Portugal":"G","Romania":"G","Slovakia":"G","Spain":"G","Sweden":"G","Switzerland":"G","United Kingdom":"G","Albania":"H","Armenia":"H","Azerbaijan":"H","Belarus":"H","Croatia":"H","Cyprus":"H","Georgia":"H","Iceland":"H","Israel":"H","Kazakhstan":"H","Moldova":"H","Montenegro":"H","Russia":"H","Serbia":"H","Slovenia":"H","Turkiye":"H","Ukraine":"H","Uzbekistan":"H","American Samoa":"I","Argentina":"I","Bahamas":"I","Belize":"I","Bolivia":"I","Brazil":"I","Chile":"I","Colombia":"I","Costa Rica":"I","Cuba":"I","Dominican Republic":"I","Ecuador":"I","El Salvador":"I","Fiji":"I","Guatemala":"I","Haiti":"I","Honduras":"I","Jamaica":"I","Martinique":"I","Nicaragua":"I","Panama":"I","Papua New Guinea":"I","Paraguay":"I","Peru":"I","Trinidad and Tobago":"I","Uruguay":"I","Venezuela":"I","Afghanistan":"J","Algeria":"J","Angola":"J","Bahrain":"J","Bangladesh":"J","Benin":"J","Bhutan":"J","Burkina Faso":"J","Burundi":"J","Cameroon":"J","Egypt":"J","Ethiopia":"J","Gabon":"J","Ghana":"J","Guinea":"J","Iran, Islamic Rep. of":"J","Iraq":"J","Jordan":"J","Kenya":"J","Kuwait":"J","Lebanon":"J","Libya":"J","Madagascar":"J","Maldives":"J","Mali":"J","Mauritius":"J","Morocco":"J","Mozambique":"J","Namibia":"J","Nepal":"J","Niger":"J","Nigeria":"J","Oman":"J","Pakistan":"J","Qatar":"J","Rwanda":"J","Saudi Arabia":"J","Senegal":"J","South Africa":"J","Sri Lanka":"J","Sudan":"J","Syria":"J","Tanzania":"J","Togo":"J","Tunisia":"J","Uganda":"J","United Arab Emirates":"J","Yemen":"J","Zambia":"J","Zimbabwe":"J"};
+
+const FEDEX_PUB_ENV = {0.5:[45400,47900,47900,58600,61100,62000,67500,76000,80200,89300]};
+const FEDEX_PUB_PAK = {0.5:[71600,71700,73600,81100,85000,86300,91800,97200,101700,105100],1.0:[89300,89100,91600,100200,110300,110900,128700,139600,145900,150000],1.5:[108900,109400,109700,120000,136400,137700,162400,177200,185900,192200],2.0:[126300,128600,130900,143600,160300,161600,192900,209300,218600,226600],2.5:[144600,149600,150600,165700,185800,187600,224500,243000,254100,262500]};
+const FEDEX_PUB_IP = {0.5:[125700,132200,132000,137400,142100,145500,146400,154000,163400,193300],1.0:[136700,145100,144700,155600,157900,160800,173300,186500,188800,222300],1.5:[147700,158000,157400,173800,173700,176100,200200,219000,214200,251300],2.0:[158700,170900,170100,192000,189500,191400,227100,251500,239600,280300],2.5:[169700,183800,182800,210200,205300,206700,254000,284000,265000,309300],3.0:[176800,193000,192300,225200,219600,221600,273600,309700,292200,341000],3.5:[183900,202200,201800,240200,233900,236500,293200,335400,319400,372700],4.0:[191000,211400,211300,255200,248200,251400,312800,361100,346600,404400],4.5:[198100,220600,220800,270200,262500,266300,332400,386800,373800,436100],5.0:[205200,229800,230300,285200,276800,281200,352000,412500,401000,467800],5.5:[211800,237700,238200,297400,290300,294300,371100,436100,426300,496900],6.0:[218400,245600,246100,309600,303800,307400,390200,459700,451600,526000],6.5:[225000,253500,254000,321800,317300,320500,409300,483300,476900,555100],7.0:[231600,261400,261900,334000,330800,333600,428400,506900,502200,584200],7.5:[238200,269300,269800,346200,344300,346700,447500,530500,527500,613300],8.0:[244800,277200,277700,358400,357800,359800,466600,554100,552800,642400],8.5:[251400,285100,285600,370600,371300,372900,485700,577700,578100,671500],9.0:[258000,293000,293500,382800,384800,386000,504800,601300,603400,700600],9.5:[264600,300900,301400,395000,398300,399100,523900,624900,628700,729700],10.0:[271200,308800,309300,407200,411800,412200,543000,648500,654000,758800],10.5:[276700,314200,316100,415600,421300,422600,560600,668600,671400,778500],11.0:[282200,319600,322900,424000,430800,433000,578200,688700,688800,798200],11.5:[287700,325000,329700,432400,440300,443400,595800,708800,706200,817900],12.0:[293200,330400,336500,440800,449800,453800,613400,728900,723600,837600],12.5:[298700,335800,343300,449200,459300,464200,631000,749000,741000,857300],13.0:[304200,341200,350100,457600,468800,474600,648600,769100,758400,877000],13.5:[309700,346600,356900,466000,478300,485000,666200,789200,775800,896700],14.0:[315200,352000,363700,474400,487800,495400,683800,809300,793200,916400],14.5:[320700,357400,370500,482800,497300,505800,701400,829400,810600,936100],15.0:[326200,362800,377300,491200,506800,516200,719000,849500,828000,955800],15.5:[331700,368200,384100,499600,516300,526600,736600,869600,845400,975500],16.0:[337200,373600,390900,508000,525800,537000,754200,889700,862800,995200],16.5:[342700,379000,397700,516400,535300,547400,771800,909800,880200,1014900],17.0:[348200,384400,404500,524800,544800,557800,789400,929900,897600,1034600],17.5:[353700,389800,411300,533200,554300,568200,807000,950000,915000,1054300],18.0:[359200,395200,418100,541600,563800,578600,824600,970100,932400,1074000],18.5:[364700,400600,424900,550000,573300,589000,842200,990200,949800,1093700],19.0:[370200,406000,431700,558400,582800,599400,859800,1010300,967200,1113400],19.5:[375700,411400,438500,566800,592300,609800,877400,1030400,984600,1133100],20.0:[380100,416800,445300,575200,601800,620200,895000,1050500,1002000,1152800],20.5:[380100,422200,452100,583600,611300,630600,912600,1070600,1019400,1172500]};
+const FEDEX_PUB_OVER = {"21-44":[18100,20500,24100,27800,29200,30100,43500,51700,51100,59900],"45-70":[17900,19300,23600,23900,28600,29500,42600,46700,46600,55300],"71-99":[17700,18600,23600,22800,28300,29100,42200,44300,46000,51100],"100-299":[17000,17700,22200,22000,27600,29000,41900,43900,45700,50300],"300-499":[16700,17500,21600,21800,26700,28000,40700,42500,44700,48700],"500-999":[16600,17200,21500,21800,26400,27400,40700,41900,44700,47700],"1000+":[16600,17100,21500,21800,26400,27400,40700,41800,44700,47700]};
+const FEDEX_PUB_ECON = {0.5:[123000,128900,129300,134900,139800,142700,143500,150600,159600,189400],1.0:[133500,141300,141800,152800,155400,157900,169700,182700,184700,217700],1.5:[144000,153700,154300,170700,171000,173100,195900,214800,209800,246000],2.0:[154500,166100,166800,188600,186600,188300,222100,246900,234900,274300],2.5:[165000,178500,179300,206500,202200,203500,248300,279000,260000,302600],3.0:[171900,187700,188700,220900,215900,218400,267700,304000,286700,333900],3.5:[178800,196900,198100,235300,229600,233300,287100,329000,313400,365200],4.0:[185700,206100,207500,249700,243300,248200,306500,354000,340100,396500],4.5:[192600,215300,216900,264100,257000,263100,325900,379000,366800,427800],5.0:[199500,224500,226300,278500,270700,278000,345300,404000,393500,459100],5.5:[206100,232400,234100,290900,284100,291000,364000,427100,418300,487700],6.0:[212700,240300,241900,303300,297500,304000,382700,450200,443100,516300],6.5:[219300,248200,249700,315700,310900,317000,401400,473300,467900,544900],7.0:[225900,256100,257500,328100,324300,330000,420100,496400,492700,573500],7.5:[232500,264000,265300,340500,337700,343000,438800,519500,517500,602100],8.0:[239100,271900,273100,352900,351100,356000,457500,542600,542300,630700],8.5:[245700,279800,280900,365300,364500,369000,476200,565700,567100,659300],9.0:[252300,287700,288700,377700,377900,382000,494900,588800,591900,687900],9.5:[258900,295600,296500,390100,391300,395000,513600,611900,616700,716500],10.0:[265500,303500,304300,402500,404700,408000,532300,635000,641500,745100],10.5:[268500,307000,309100,407100,410800,414600,544600,648700,652900,758200],11.0:[271500,310500,313900,411700,416900,421200,556900,662400,664300,771300],11.5:[274500,314000,318700,416300,423000,427800,569200,676100,675700,784400],12.0:[277500,317500,323500,420900,429100,434400,581500,689800,687100,797500],12.5:[280500,321000,328300,425500,435200,441000,593800,703500,698500,810600],13.0:[283500,324500,333100,430100,441300,447600,606100,717200,709900,823700],13.5:[286500,328000,337900,434700,447400,454200,618400,730900,721300,836800],14.0:[289500,331500,342700,439300,453500,460800,630700,744600,732700,849900],14.5:[292500,335000,347500,443900,459600,467400,643000,758300,744100,863000],15.0:[295500,338500,352300,448500,465700,474000,655300,772000,755500,876100],15.5:[298500,342000,357100,453100,471800,480600,667600,785700,766900,889200],16.0:[301500,345500,361900,457700,477900,487200,679900,799400,778300,902300],16.5:[304500,349000,366700,462300,484000,493800,692200,813100,789700,915400],17.0:[307500,352500,371500,466900,490100,500400,704500,826800,801100,928500],17.5:[310500,356000,376300,471500,496200,507000,716800,840500,812500,941600],18.0:[313500,359500,381100,476100,502300,513600,729100,854200,823900,954700],18.5:[316500,363000,385900,480700,508400,520200,741400,867900,835300,967800],19.0:[319500,366500,390700,485300,514500,526800,753700,881600,846700,980900],19.5:[322500,370000,395500,489900,520600,533400,766000,895300,858100,994000],20.0:[325500,373500,400300,494500,526700,540000,778300,909000,869500,1007100],20.5:[328500,377000,405100,499100,532800,546600,790600,922700,880900,1020200]};
+const FEDEX_PUB_ECON_OVER = {"21-44":[16100,18200,21300,24100,25500,26100,37800,44700,44500,51900],"45-70":[15900,17300,21000,20900,24600,25300,37000,40300,40500,48200],"71-99":[15800,16600,20900,19700,24400,25100,36700,38900,40000,44300],"100-299":[15200,15900,20000,19100,23900,25000,36600,38200,39700,43800],"300-499":[15100,15700,19300,18900,23100,24300,35400,36900,38900,42500],"500-999":[15000,15400,19200,18900,23100,24000,35400,36500,38900,41400],"1000+":[15000,15300,19200,18900,23100,24000,35400,36400,38900,41400]};
+
+// FedEx 수입 IP
+const FXIMP_ENV = {0.5:[62800,65400,64300,72300,76900,77000,116700,124500,130700,134100]};
+const FXIMP_PAK = {0.5:[86300,119400,93300,115600,137800,141600,141700,142200,149700,151500],1.0:[102200,135800,110500,135600,162200,165200,175800,186300,196100,213900],1.5:[116900,145300,121700,150400,185200,187600,207400,223100,234400,267200],2.0:[129800,160700,134500,167000,207800,213400,240300,263800,278900,322100],2.5:[144700,173300,148800,184700,232900,238900,273200,305100,319100,384100]};
+const FXIMP_IP = {0.5:[93700,133600,97200,117500,154900,159000,187900,206700,228100,242000],1.0:[111700,152100,114800,137400,181000,185300,217200,242500,266800,283100],1.5:[129700,170600,132400,157300,207100,211600,246500,278300,305500,324200],2.0:[147700,189100,150000,177200,233200,237900,275800,314100,344200,365300],2.5:[165700,207600,167600,197100,259300,264200,305100,349900,382900,406400],3.0:[173900,221200,183200,216900,283900,288900,336500,387200,419500,451000],3.5:[182100,234800,198800,236700,308500,313600,367900,424500,456100,495600],4.0:[190300,248400,214400,256500,333100,338300,399300,461800,492700,540200],4.5:[198500,262000,230000,276300,357700,363000,430700,499100,529300,584800],5.0:[206700,275600,245600,296100,382300,387700,462100,536400,565900,629400],5.5:[217700,288600,259000,311900,396900,402400,483500,565100,598300,666200],6.0:[228700,301600,272400,327700,411500,417100,504900,593800,630700,703000],6.5:[239700,314600,285800,343500,426100,431800,526300,622500,663100,739800],7.0:[250700,327600,299200,359300,440700,446500,547700,651200,695500,776600],7.5:[261700,340600,312600,375100,455300,461200,569100,679900,727900,813400],8.0:[272700,353600,326000,390900,469900,475900,590500,708600,760300,850200],8.5:[283700,366600,339400,406700,484500,490600,611900,737300,792700,887000],9.0:[294700,379600,352800,422500,499100,505300,633300,766000,825100,923800],9.5:[305700,392600,366200,438300,513700,520000,654700,794700,857500,960600],10.0:[316700,405600,379600,454100,528300,534700,676100,823400,889900,997400],10.5:[324300,416900,388600,466300,539200,548000,688700,841800,908400,1021700],11.0:[331900,428200,397600,478500,550100,561300,701300,860200,926900,1046000],11.5:[339500,439500,406600,490700,561000,574600,713900,878600,945400,1070300],12.0:[347100,450800,415600,502900,571900,587900,726500,897000,963900,1094600],12.5:[354700,462100,424600,515100,582800,601200,739100,915400,982400,1118900],13.0:[362300,473400,433600,527300,593700,614500,751700,933800,1000900,1143200],13.5:[369900,484700,442600,539500,604600,627800,764300,952200,1019400,1167500],14.0:[377500,496000,451600,551700,615500,641100,776900,970600,1037900,1191800],14.5:[385100,507300,460600,563900,626400,654400,789500,989000,1056400,1216100],15.0:[392700,518600,469600,576100,637300,667700,802100,1007400,1074900,1240400],15.5:[400300,529900,478600,588300,648200,681000,814700,1025800,1093400,1264700],16.0:[407900,541200,487600,600500,659100,694300,827300,1044200,1111900,1289000],16.5:[415500,552500,496600,612700,670000,707600,839900,1062600,1130400,1313300],17.0:[423100,563800,505600,624900,680900,720900,852500,1081000,1148900,1337600],17.5:[430700,575100,514600,637100,691800,734200,865100,1099400,1167400,1361900],18.0:[438300,586400,523600,649300,702700,747500,877700,1117800,1185900,1386200],18.5:[445900,597700,532600,661500,713600,760800,890300,1136200,1204400,1410500],19.0:[453500,609000,541600,673700,724500,774100,902900,1154600,1222900,1434800],19.5:[461100,620300,550600,685900,735400,787400,915500,1173000,1241400,1459100],20.0:[468700,631600,559600,698100,746300,800700,924000,1191400,1259900,1483400],20.5:[476300,642900,568600,710300,757200,814000,924000,1209800,1278400,1507700]};
+const FXIMP_OVER = {"21-44":[23300,31200,31800,34400,36600,38900,44000,57700,61300,71900],"45-70":[20900,24400,25900,31000,33100,35000,38800,52400,54900,65100],"71-99":[19700,22100,25600,28700,30200,33000,33500,48000,51100,59700],"100-299":[18500,20900,23700,26800,29100,30500,31000,45900,49200,56300],"300-499":[18100,19700,22200,24800,28300,29700,30000,44400,47600,53300],"500-999":[17800,19100,21500,23900,27100,28300,28300,42700,45300,50300],"1000+":[17700,18900,21400,23900,27000,28300,28300,42700,45200,50300]};
+const FXIMP_ECON = {0.5:[92200,130900,94900,80500,113300,115500,130800,131900,139300,140400],1.0:[109600,149200,112300,93800,131700,134000,151800,166700,180400,184200],1.5:[127000,167500,129700,107100,150100,152500,172800,201500,221500,228000],2.0:[144400,185800,147100,120400,168500,171000,193800,236300,262600,271800],2.5:[161800,204100,164500,133700,186900,189500,214800,271100,303700,315600],3.0:[170100,217200,179800,146500,205100,207800,235800,295100,328500,341500],3.5:[178400,230300,195100,159300,223300,226100,256800,319100,353300,367400],4.0:[186700,243400,210400,172100,241500,244400,277800,343100,378100,393300],4.5:[195000,256500,225700,184900,259700,262700,298800,367100,402900,419200],5.0:[203300,269600,241000,197700,277900,281000,319800,391100,427700,445100],5.5:[213900,282400,254400,209300,289300,292500,334800,412800,450000,470600],6.0:[224500,295200,267800,220900,300700,304000,349800,434500,472300,496100],6.5:[235100,308000,281200,232500,312100,315500,364800,456200,494600,521600],7.0:[245700,320800,294600,244100,323500,327000,379800,477900,516900,547100],7.5:[256300,333600,308000,255700,334900,338500,394800,499600,539200,572600],8.0:[266900,346400,321400,267300,346300,350000,409800,521300,561500,598100],8.5:[277500,359200,334800,278900,357700,361500,424800,543000,583800,623600],9.0:[288100,372000,348200,290500,369100,373000,439800,564700,606100,649100],9.5:[298700,384800,361600,302100,380500,384500,454800,586400,628400,674600],10.0:[309300,397600,375000,313700,391900,396000,469800,608100,650700,700100],10.5:[315000,405700,381400,322100,401200,405400,479300,622400,667400,715700],11.0:[320700,413800,387800,330500,410500,414800,488800,636700,684100,731300],11.5:[326400,421900,394200,338900,419800,424200,498300,651000,700800,746900],12.0:[332100,430000,400600,347300,429100,433600,507800,665300,717500,762500],12.5:[337800,438100,407000,355700,438400,443000,517300,679600,734200,778100],13.0:[343500,446200,413400,364100,447700,452400,526800,693900,750900,793700],13.5:[349200,454300,419800,372500,457000,461800,536300,708200,767600,809300],14.0:[354900,462400,426200,380900,466300,471200,545800,722500,784300,824900],14.5:[360600,470500,432600,389300,475600,480600,555300,736800,801000,840500],15.0:[366300,478600,439000,397700,484900,490000,564800,751100,817700,856100],15.5:[372000,486700,445400,406100,494200,499400,574300,765400,834400,871700],16.0:[377700,494800,451800,414500,503500,508800,583800,779700,851100,887300],16.5:[383400,502900,458200,422900,512800,518200,593300,794000,867800,902900],17.0:[389100,511000,464600,431300,522100,527600,602800,808300,884500,918500],17.5:[394800,519100,471000,439700,531400,537000,612300,822600,901200,934100],18.0:[400500,527200,477400,448100,540700,546400,621800,836900,917900,949700],18.5:[406200,535300,483800,456500,550000,555800,631300,851200,934600,965300],19.0:[411900,543400,490200,464900,559300,565200,640800,865500,951300,980900],19.5:[417600,551500,496600,473300,568600,574600,650300,879800,968000,996500],20.0:[423300,559600,503000,481700,577900,584000,659800,894100,984700,1012100],20.5:[429000,567700,509400,490100,587200,593400,669300,908400,1001400,1027700]};
+const FXIMP_ECON_OVER = {"21-44":[20700,27600,28200,25200,28300,30900,32500,46100,48900,51900],"45-70":[18500,21600,23000,23200,25100,28200,29000,42200,44800,46500],"71-99":[17600,19700,22900,22400,23500,25700,26200,39400,42800,44500],"100-299":[16400,18600,21100,21100,23000,24400,24100,39100,40900,42800],"300-499":[16100,17800,20000,20200,22700,23800,23200,38200,40300,42300],"500-999":[15900,17300,19300,20100,22700,23600,23000,38200,40300,42300],"1000+":[15800,17100,19300,20100,22700,23600,23000,38200,40300,42300]};
+
+// ══════════════════════════════════════════════════════════
+// DATA: UPS
+// ══════════════════════════════════════════════════════════
+const UPS_ZONE_MAP = {"China (People's Republic)":1,"Macau SAR China":1,"Singapore":1,"Taiwan, China":1,"Japan":2,"Vietnam":2,"Brunei":3,"Indonesia":3,"Malaysia":3,"Philippines":3,"Thailand":3,"Australia":4,"India":4,"New Zealand":4,"Canada":5,"Mexico":5,"Puerto Rico":5,"United States of America":5,"Belgium":6,"Czech Republic":6,"France":6,"Germany":6,"Italy":6,"Liechtenstein":6,"Luxembourg":6,"Monaco":6,"Netherlands":6,"Poland":6,"Slovakia":6,"Spain":6,"Sweden":6,"Switzerland":6,"United Kingdom":6,"Austria":7,"Denmark":7,"Finland":7,"Greece":7,"Ireland":7,"Norway":7,"Portugal":7,"Argentina":8,"Armenia":8,"Bahrain":8,"Bangladesh":8,"Bolivia":8,"Brazil":8,"Bulgaria":8,"Cambodia":8,"Chile":8,"Colombia":8,"Costa Rica":8,"Croatia":8,"Dominican Republic":8,"Ecuador":8,"Egypt":8,"El Salvador":8,"Guatemala":8,"Haiti":8,"Honduras":8,"Hungary":8,"Iceland":8,"Jamaica":8,"Kuwait":8,"Lao P.D.R.":8,"Latvia":8,"Lithuania":8,"Maldives":8,"Malta":8,"Myanmar":8,"Nicaragua":8,"Oman":8,"Pakistan":8,"Panama":8,"Paraguay":8,"Peru":8,"Qatar":8,"Romania":8,"Saudi Arabia":8,"Slovenia":8,"South Africa":8,"Sri Lanka":8,"Turkiye":8,"Ukraine":8,"United Arab Emirates":8,"Uruguay":8,"Venezuela":8,"Trinidad and Tobago":8,"Albania":9,"Algeria":9,"Angola":9,"Benin":9,"Burkina Faso":9,"Burundi":9,"Cameroon":9,"Estonia":9,"Ethiopia":9,"Gabon":9,"Georgia":9,"Ghana":9,"Guinea":9,"Israel":9,"Jordan":9,"Kazakhstan":9,"Kenya":9,"Lebanon":9,"Madagascar":9,"Mali":9,"Moldova":9,"Montenegro":9,"Morocco":9,"Mozambique":9,"Namibia":9,"Niger":9,"Nigeria":9,"Russia":9,"Rwanda":9,"Senegal":9,"Serbia":9,"Sudan":9,"Tanzania":9,"Togo":9,"Tunisia":9,"Uganda":9,"Zambia":9,"Zimbabwe":9,"Hong Kong SAR China":10,"Cyprus":8,"Mongolia":9,"Nepal":9,"Martinique":8};
+const UPS_NO_SERVICE = new Set(["Bhutan","Fiji","Papua New Guinea","Yemen","Cuba","Iran, Islamic Rep. of"]);
+const FEDEX_NO_SERVICE = new Set(["Iran, Islamic Rep. of"]);
+
+const UPS_PUB_LTR = {0.5:[49700,51600,53000,64800,71700,68100,74100,87400,108600,46700],1.0:[76500,79300,80300,93000,110900,109300,116500,139400,155900,75300],1.5:[105100,106400,109100,122100,147800,150800,161300,195900,206800,101400],2.0:[130200,133200,137100,152100,180700,184200,203200,247400,255400,125700],2.5:[158300,162400,166200,182900,219400,227500,250400,304200,305100,152900],3.0:[171300,180500,186200,210400,239500,248600,274700,340400,343700,165500],3.5:[182200,194000,204700,233200,253900,270300,294800,377100,384100,175700],4.0:[194900,205700,222000,251500,268500,291500,314900,411300,421800,188100],4.5:[202900,215500,233300,267600,286400,312700,335200,441600,460800,196000],5.0:[209400,225200,244600,284300,301200,333900,355100,472200,501000,202300]};
+const UPS_PUB_NDC = {0.5:[134200,135800,147200,150600,159400,144900,154500,203300,204900,129800],1.0:[144400,146800,157500,163200,176000,165600,179200,232300,239900,139500],1.5:[154600,156400,167900,177000,191900,186200,204100,261200,275700,149100],2.0:[164800,166500,178100,190200,207700,207000,228300,291100,311400,159100],2.5:[174000,176500,188900,203200,223900,227500,252900,320200,346700,168000],3.0:[182300,186200,200200,219100,239500,248600,274700,350900,377700,176100],3.5:[189800,195900,211000,235500,253900,270300,294800,380900,408700,183000],4.0:[196900,205700,222000,251500,268500,291500,314900,411300,439400,190000],4.5:[202900,215500,233300,267600,286400,312700,335200,441600,470200,196000],5.0:[209400,225200,244600,284300,301200,333900,355100,472200,501000,202300],5.5:[215600,236400,255500,296900,316000,356000,375500,505300,532000,208200],6.0:[221600,246400,266800,309100,330900,377400,396400,538600,562800,214000],6.5:[227300,257500,277600,321800,345600,399500,416300,572600,593800,219400],7.0:[232900,267500,288400,334300,359900,421400,437200,605800,624400,224900],7.5:[238200,278700,299900,346900,370600,443200,457200,639300,655400,230200],8.0:[243900,287800,309800,359300,384800,461300,479700,670100,682300,235300],8.5:[248500,296800,319600,371800,398900,478500,501900,701700,709700,240200],9.0:[254400,306200,329600,384300,412400,496000,524400,733000,736900,245400],9.5:[259600,315100,339800,397000,426600,513600,546900,763800,764200,250600],10.0:[264800,324200,349800,409800,440900,531200,568900,795000,799300,255700],10.5:[270000,330900,356900,419800,451000,546500,588700,822400,826400,260900],11.0:[275300,337600,364100,430100,462300,561800,608700,850600,853600,265900],11.5:[280700,344100,371800,440200,473300,577300,628100,879000,880400,271000],12.0:[285900,350800,378700,450700,483600,592400,648000,906000,907600,276400],12.5:[291200,357500,386000,461200,494900,607800,667500,934600,934600,281400],13.0:[296300,363800,392100,471200,506000,621900,687300,959300,961900,285900],13.5:[301900,370600,398000,481700,516900,636200,706900,983500,988900,291600],14.0:[307300,376800,404400,492000,527200,650600,727100,1008100,1005500,296700],14.5:[312300,383700,410300,502600,538500,665100,746800,1033000,1032200,301900],15.0:[317600,390100,416400,513000,549500,678900,766700,1057600,1058900,306700],15.5:[323000,391000,417400,517000,560000,693300,774700,1085900,1090300,311700],16.0:[328400,392500,418600,521700,570400,707200,782200,1113800,1121500,317200],16.5:[333300,394000,419300,526700,581000,727800,790400,1141900,1152400,322100],17.0:[338600,394900,420400,531100,591800,749300,798100,1169900,1183700,327300],17.5:[344000,396300,421800,535100,602700,766700,805700,1197900,1214300,332400],18.0:[348300,397400,422100,539500,610400,788100,821200,1215600,1232100,336100],18.5:[352000,398600,422500,543700,618400,808100,836800,1232900,1250300,339700],19.0:[355700,400000,423400,547800,632700,828400,858500,1250200,1265800,343500],19.5:[363100,401100,424100,551600,644200,849400,880100,1270400,1281200,352200],20.0:[372000,402800,425200,557900,660000,870100,901700,1302800,1301200,360800]};
+const UPS_PUB_OVER = {"21-44":[18600,20000,21000,27800,32100,43500,44900,63800,63700,18000],"45-70":[18600,20000,21000,27800,32100,43500,44900,63800,63700,18000],"71-99":[17000,18500,20300,27300,30500,42300,44200,63200,63200,16900],"100-299":[17000,18500,20300,27300,30500,42300,44200,63200,63200,16900],"300-499":[16400,17300,19400,26500,29200,42000,43300,61600,61700,16500],"500+":[16400,17300,19400,26500,29200,42000,43300,61600,61700,16500]};
+
+// UPS 수입
+const UPS_IMP_ZONE_MAP = {"Philippines":1,"Singapore":1,"Hong Kong SAR China":2,"Japan":2,"Thailand":2,"Vietnam":2,"China (People's Republic)":3,"India":3,"Malaysia":3,"Pakistan":3,"Taiwan, China":3,"Macau SAR China":3,"Australia":4,"Bangladesh":4,"Brunei":4,"Cambodia":4,"Indonesia":4,"Mongolia":4,"Myanmar":4,"Nepal":4,"New Zealand":4,"Sri Lanka":4,"United States of America":5,"Canada":5,"Mexico":5,"Puerto Rico":5,"Belgium":6,"France":6,"Germany":6,"Italy":6,"Monaco":6,"Netherlands":6,"Spain":6,"United Kingdom":6,"Luxembourg":6,"Portugal":6,"Ireland":6,"Austria":7,"Czech Republic":7,"Denmark":7,"Finland":7,"Greece":7,"Hungary":7,"Norway":7,"Poland":7,"Sweden":7,"Switzerland":7,"Algeria":8,"Argentina":8,"Bahrain":8,"Iceland":8,"Israel":8,"Jordan":8,"Kenya":8,"Kuwait":8,"Lebanon":8,"Oman":8,"Qatar":8,"Romania":8,"Saudi Arabia":8,"Turkiye":8,"Ukraine":8,"United Arab Emirates":8,"Zambia":8,"Afghanistan":9,"Bolivia":9,"Brazil":9,"Cameroon":9,"Chile":9,"Colombia":9,"Dominican Republic":9,"Ecuador":9,"Egypt":9,"El Salvador":9,"Ethiopia":9,"Ghana":9,"Guatemala":9,"Haiti":9,"Honduras":9,"Jamaica":9,"Libya":9,"Madagascar":9,"Morocco":9,"Mozambique":9,"Nicaragua":9,"Nigeria":9,"Panama":9,"Paraguay":9,"Peru":9,"Rwanda":9,"Senegal":9,"South Africa":9,"Sudan":9,"Tanzania":9,"Togo":9,"Trinidad and Tobago":9,"Tunisia":9,"Uruguay":9,"Venezuela":9,"Zimbabwe":9};
+const UPS_IMP_DOC = {0.5:[49700,56900,54000,69400,70000,77600,80900,98700,120100],1.0:[77900,79200,79500,103800,109300,122100,129600,152300,172000],1.5:[104900,106400,108000,135900,145900,168600,179500,214100,224000],2.0:[130200,133200,135900,166900,178400,205600,226200,270300,273700],2.5:[158100,162200,164700,200700,216500,251600,278800,332100,324800],3.0:[171000,180300,184400,230900,234000,277700,305700,371700,357900],3.5:[182000,193800,202900,256100,250200,301800,328400,411700,387800],4.0:[194700,205500,219900,276300,264800,325500,350600,444600,418800],4.5:[202800,215100,231200,293700,280700,348500,373000,469700,450100],5.0:[209200,224900,242200,312100,295400,368400,395400,495400,486200]};
+const UPS_IMP_NDC = {0.5:[134200,135700,145800,165400,155600,161800,172100,214700,218500],1.0:[144300,146600,155900,179100,173500,185000,199500,253700,242200],1.5:[154400,156300,166200,194100,189500,208100,227200,285500,269800],2.0:[164800,166500,176400,208600,205000,231000,254200,318000,304100],2.5:[173800,176300,187200,223000,220900,254200,281700,349600,338400],3.0:[181900,186000,198200,240600,236400,277700,305700,383100,369000],3.5:[189600,195700,209200,258700,250200,301800,328400,415900,399800],4.0:[196700,205500,219900,276300,264800,325500,350600,444600,431800],4.5:[202800,215100,231200,293700,280700,348500,373000,469700,464100],5.0:[209200,224900,242200,312100,295400,372100,395400,495400,496100],5.5:[215400,235900,252900,325800,310000,394400,418200,518400,519200],6.0:[221400,246100,264200,339300,324500,410000,441200,546100,549400],6.5:[227000,257100,275000,353200,338900,425600,463400,576200,579700],7.0:[232700,267300,285700,367000,353000,441300,486500,606000,609700],7.5:[237800,278200,296900,380900,365400,456600,509000,636000,640100],8.0:[247200,287400,306800,394500,379400,472900,534100,662300,666100],8.5:[256600,296600,316500,408000,393200,488000,558900,689000,692900],9.0:[266300,305800,326300,421900,406800,503600,583700,715400,719300],9.5:[276300,314700,336400,435800,420600,519300,608800,742000,746100],10.0:[285900,323900,346500,449800,434600,534600,633500,776200,780400],10.5:[295700,330500,353400,460700,444900,547400,655700,802500,807000],11.0:[305300,343500,360500,472000,455800,560800,677700,828900,828700],11.5:[315000,357100,368000,483100,466700,573900,699300,861800,864000],12.0:[322100,371000,375300,494400,477000,586800,721400,890900,892300],12.5:[328000,385000,385800,505900,488100,600200,743000,923700,920300],13.0:[333900,398800,392200,517000,499100,613100,765200,948300,947500],13.5:[340100,412400,405300,528800,509500,626400,785400,968000,964700],14.0:[346100,424500,419800,540100,520000,639700,807600,983700,981300],14.5:[351900,432200,434200,551600,531000,652900,829500,1002600,1007900],15.0:[357800,439400,448700,562900,541700,666000,851600,1028500,1034000],15.5:[363900,440600,462800,567500,552300,681700,860300,1058700,1064300],16.0:[370400,443100,467600,572800,562500,699300,868900,1088800,1094800],16.5:[376100,444800,468500,578100,573100,720300,878000,1118800,1125100],17.0:[382400,445900,469500,582900,583400,741300,886500,1149100,1155800],17.5:[388600,447200,472300,587500,590800,760400,894900,1178700,1185700],18.0:[393100,448700,472600,592200,598500,780400,912400,1196100,1202800],18.5:[397100,449800,472900,596500,606300,798400,929700,1213800,1217200],19.0:[401600,451500,473900,601200,620300,817200,946000,1228800,1243900],19.5:[410000,453100,474600,605300,631700,835900,962000,1243900,1271000],20.0:[420400,454400,476000,612500,647000,852900,977200,1263600,1302400]};
+const UPS_IMP_OVER = {"21-44":[21000,22500,23600,30500,31800,42600,48000,62200,63800],"45-70":[21000,22500,23600,30500,31800,42600,45100,62200,63800],"71-99":[19100,20900,22500,29100,30000,41300,42900,61400,62600],"100-299":[19100,20900,22500,28600,30000,41300,42900,61400,62600],"300-499":[17900,19500,21900,27100,29100,40900,42000,59800,56300],"500-999":[17900,19500,21900,27100,29100,40900,42000,59800,56300],"1000+":[17900,19500,21900,27100,29100,40900,42000,59800,56300]};
+
+// FedEx EDS (수출)
+const FEDEX_EDS = {"G":1600,"H":1600,"J":2250};
+// FedEx US 인바운드 처리 수수료
+const FEDEX_US_INBOUND_FEE = 3900;
+// UPS 급증수수료
+const UPS_SURGE = {"Israel":4722,"Bahrain":2004,"Egypt":2004,"Iran, Islamic Rep. of":2004,"Iraq":2004,"Jordan":2004,"Kuwait":2004,"Lebanon":2004,"Oman":2004,"Qatar":2004,"Saudi Arabia":2004,"Syria":2004,"United Arab Emirates":2004,"Yemen":2004};
+// DHL 소요일 (Zone 1~8)
+const DHL_DAYS = [1,2,3,4,5,5,6,7];
+// FedEx 소요일 (Zone A~J)
+const FEDEX_DAYS_IP   = [1,2,3,4,5,5,5,6,7,7];
+const FEDEX_DAYS_ECON = [3,4,5,5,6,6,7,8,9,9];
+// UPS 소요일 (Zone 1~10)
+const UPS_DAYS = [1,2,3,4,5,5,6,7,8,1];
+
+// ══════════════════════════════════════════════════════════
+// UTIL
+// ══════════════════════════════════════════════════════════
+function ceil10(x) { return Math.ceil(x / 10) * 10; }
+function ceilHalf(w) { return Math.ceil(w * 2) / 2; }
+function fmtKRW(n) { return '₩' + Math.round(n).toLocaleString('ko-KR'); }
+function fmtWt(w) { return w.toFixed(1) + ' kg'; }
+
+function lookupTable(table, w) {
+  const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
+  for (const k of keys) { if (k >= w) return table[k]; }
+  return table[keys[keys.length-1]];
+}
+
+// ══════════════════════════════════════════════════════════
+// CALC WEIGHT
+// ══════════════════════════════════════════════════════════
+function calcWeight(actual, L, W, H) {
+  const vol = (L * W * H) / 5000;
+  const chargeable = Math.max(actual, vol);
+  return { actual, vol: Math.round(vol*100)/100, chargeable };
+}
+function roundWtDHL(w)   { return w <= 30 ? ceilHalf(w) : Math.ceil(w); }
+function roundWtFedEx(w) { return w <= 20.5 ? ceilHalf(w) : Math.ceil(w); }
+function roundWtUPS(w)   { return w <= 20 ? ceilHalf(w) : Math.ceil(w); }
+
+// ══════════════════════════════════════════════════════════
+// DHL LOOKUP
+// ══════════════════════════════════════════════════════════
+function dhlLookup(w, zi, isDoc, imp) {
+  if (imp) {
+    if (isDoc && w <= 2.0) {
+      const k = ceilHalf(w);
+      return ceil10(lookupTable(DHL_IMP_DOX, k)[zi]);
+    }
+    if (w <= 30) {
+      const k = ceilHalf(w);
+      return ceil10(lookupTable(DHL_IMP_NDC, k)[zi]);
+    }
+    const rw = Math.ceil(w);
+    const br = rw<=70?'30-70':rw<=300?'70-300':'300+';
+    return ceil10(DHL_IMP_OVER[br][zi] * rw);
+  }
+  const tbl = (isDoc && w <= 2.0) ? DHL_PUB_DOC : DHL_PUB_NDC;
+  if (w <= 30) {
+    const k = ceilHalf(w);
+    return ceil10(lookupTable(tbl, k)[zi]);
+  }
+  const rw = Math.ceil(w);
+  const br = rw<=70?'30.1-70':rw<=300?'70.1-300':'300.1+';
+  return ceil10(DHL_PUB_OVER[br][zi] * rw);
+}
+
+// ══════════════════════════════════════════════════════════
+// FEDEX LOOKUP
+// ══════════════════════════════════════════════════════════
+function fedexLookup(w, zi, isDoc, econ, imp) {
+  if (!econ && isDoc) {
+    if (!imp) {
+      if (w <= 0.5) return ceil10(FEDEX_PUB_ENV[0.5][zi]);
+      if (w <= 2.5) { const k=ceilHalf(w); return ceil10(lookupTable(FEDEX_PUB_PAK,k)[zi]); }
+    } else {
+      if (w <= 0.5) return ceil10(FXIMP_ENV[0.5][zi]);
+      if (w <= 2.5) { const k=ceilHalf(w); return ceil10(lookupTable(FXIMP_PAK,k)[zi]); }
+    }
+  }
+  const tbl  = imp ? (econ ? FXIMP_ECON   : FXIMP_IP)   : (econ ? FEDEX_PUB_ECON   : FEDEX_PUB_IP);
+  const over = imp ? (econ ? FXIMP_ECON_OVER : FXIMP_OVER) : (econ ? FEDEX_PUB_ECON_OVER : FEDEX_PUB_OVER);
+  if (w <= 20.5) {
+    const k=ceilHalf(w); return ceil10(lookupTable(tbl,k)[zi]);
+  }
+  const rw=Math.ceil(w);
+  const br=rw<=44?'21-44':rw<=70?'45-70':rw<=99?'71-99':rw<=299?'100-299':rw<=499?'300-499':rw<=999?'500-999':'1000+';
+  return ceil10(over[br][zi]*rw);
+}
+
+// ══════════════════════════════════════════════════════════
+// UPS LOOKUP
+// ══════════════════════════════════════════════════════════
+function upsLookup(w, zi, isDoc, imp) {
+  if (imp) {
+    if (isDoc && w <= 5.0) {
+      const k=ceilHalf(w); return ceil10(lookupTable(UPS_IMP_DOC,k)[zi]);
+    }
+    if (w <= 20) {
+      const k=ceilHalf(w); return ceil10(lookupTable(UPS_IMP_NDC,k)[zi]);
+    }
+    const rw=Math.ceil(w);
+    const br=rw<=44?'21-44':rw<=70?'45-70':rw<=99?'71-99':rw<=299?'100-299':rw<=499?'300-499':rw<=999?'500-999':'1000+';
+    return ceil10(UPS_IMP_OVER[br][zi]*rw);
+  }
+  if (isDoc && w <= 5.0) {
+    const k=ceilHalf(w); return ceil10(lookupTable(UPS_PUB_LTR,k)[zi]);
+  }
+  if (w <= 20) {
+    const k=ceilHalf(w); return ceil10(lookupTable(UPS_PUB_NDC,k)[zi]);
+  }
+  const rw=Math.ceil(w);
+  const br=rw<=44?'21-44':rw<=70?'45-70':rw<=99?'71-99':rw<=299?'100-299':rw<=499?'300-499':'500+';
+  return ceil10(UPS_PUB_OVER[br][zi]*rw);
+}
+
+// ══════════════════════════════════════════════════════════
+// MAIN CALCULATE
+// ══════════════════════════════════════════════════════════
+function calculate() {
+  const country = document.getElementById('dest-country').value;
+  if (!country) { alert('목적지 국가를 선택해주세요.'); return; }
+
+  const imp = (mode === '수입');
+  const discDHL    = parseFloat(document.getElementById('disc-dhl').value)    || 0;
+  const discFedex  = parseFloat(document.getElementById('disc-fedex').value)  || 0;
+  const discFedexE = parseFloat(document.getElementById('disc-fedex-e').value)|| 0;
+  const discUPS    = parseFloat(document.getElementById('disc-ups').value)    || 0;
+
+  // ── 중량 집계 ──
+  let totalActual = 0, totalVol = 0, totalChargeable = 0;
+  const surs = { dhl:{}, fedex:{}, ups:{} };
+
+  for (const row of ctRows) {
+    const wt = parseFloat(row.wt)||0;
+    const L  = parseFloat(row.L)||0;
+    const W  = parseFloat(row.W)||0;
+    const H  = parseFloat(row.H)||0;
+    const qty= parseInt(row.qty)||1;
+    const wi = calcWeight(wt,L,W,H);
+    totalActual     += wt * qty;
+    totalVol        += wi.vol * qty;
+    totalChargeable += wi.chargeable * qty;
+
+    const dims = [L,W,H].sort((a,b)=>b-a);
+    const rw   = wi.chargeable;
+
+    // DHL surs per piece
+    if (25 < rw && rw <= 70) surs.dhl['컨베이어 운반 불가'] = (surs.dhl['컨베이어 운반 불가']||0) + 30000*qty;
+    if (rw > 70)              surs.dhl['중량 초과']          = (surs.dhl['중량 초과']||0)          + 150000*qty;
+    if (dims[0]>100||dims[1]>80) surs.dhl['길이 초과']       = (surs.dhl['길이 초과']||0)          + 30000*qty;
+
+    // FedEx surs
+    if (rw > 50)                                    surs.fedex['특대형'] = (surs.fedex['특대형']||0) + 86000*qty;
+    else {
+      if (rw > 25)                                  surs.fedex['추가취급(중량)'] = (surs.fedex['추가취급(중량)']||0) + 35600*qty;
+      if (dims[0]>121||dims[1]>76)                  surs.fedex['추가취급(용적)'] = (surs.fedex['추가취급(용적)']||0) + 35600*qty;
+    }
+
+    // UPS surs
+    const girth = (dims[1]+dims[2])*2;
+    if ((dims[0]+girth)>300)                        surs.ups['대형포장물'] = (surs.ups['대형포장물']||0) + 69200*qty;
+    else if (dims[0]>122||dims[1]>76||wt>25)        surs.ups['비규격품(OSP)'] = (surs.ups['비규격품(OSP)']||0) + 21400*qty;
+  }
+
+  const wtDHL   = roundWtDHL(totalChargeable);
+  const wtFedEx = roundWtFedEx(totalChargeable);
+  const wtUPS   = roundWtUPS(totalChargeable);
+
+  // ── Zone ──
+  const dhlZone = DHL_ZONE_MAP[country] || 5;
+  const dhlZi   = dhlZone - 1;
+
+  const fxZone = FEDEX_ZONE_MAP_EN[country] || 'F';
+  const fxZi   = FEDEX_ZONES_LIST.indexOf(fxZone);
+
+  const upsZone = imp ? (UPS_IMP_ZONE_MAP[country]||5) : (UPS_ZONE_MAP[country]||5);
+  const upsZi   = upsZone - 1;
+
+  const upsNoService   = UPS_NO_SERVICE.has(country);
+  const fedexNoService = FEDEX_NO_SERVICE.has(country);
+
+  // ── FedEx EDS (수출) ──
+  if (!imp) {
+    const eds = (FEDEX_EDS[fxZone] || 0) * wtFedEx;
+    if (eds > 0) surs.fedex['초과수요(EDS)'] = ceil10(eds);
+    if (country === 'United States of America' || country === 'Canada') {
+      surs.fedex['미국 인바운드 처리'] = FEDEX_US_INBOUND_FEE;
+    }
+    // UPS 급증수수료
+    const surgePer = UPS_SURGE[country] || 0;
+    if (surgePer > 0) surs.ups['급증 수수료'] = ceil10(surgePer * wtUPS);
+  }
+
+  // ── Base rates ──
+  const baseDHL    = dhlLookup(wtDHL, dhlZi, isDoc, imp);
+  const baseFxIP   = fedexLookup(wtFedEx, fxZi, isDoc, false, imp);
+  const baseFxEc   = fedexLookup(wtFedEx, fxZi, false, true, imp);
+  const baseUPS    = upsLookup(wtUPS, upsZi, isDoc, imp);
+
+  // ── Build results ──
+  function buildCarrier(name, base, disc, fuel, surMap, wt) {
+    const surTotal  = Object.values(surMap).reduce((a,b)=>a+b, 0);
+    const pubDisc   = ceil10(base * (1 - disc/100));
+    const pubFuel   = ceil10(pubDisc * fuel/100);
+    const surFuel   = ceil10(surTotal * fuel/100);
+    const total     = pubDisc + pubFuel + surTotal + surFuel;
+    return { base, pubDisc, pubFuel, surTotal, surFuel, total, surs: surMap, disc, fuel, wt };
+  }
+
+  const rDHL    = buildCarrier('DHL Express',   baseDHL,   discDHL,    FUEL.dhl,   {...surs.dhl},   wtDHL);
+  const rFxIP   = buildCarrier('FedEx IP',      baseFxIP,  discFedex,  FUEL.fedex, {...surs.fedex}, wtFedEx);
+  const rFxEc   = buildCarrier('FedEx Economy', baseFxEc,  discFedexE, FUEL.fedex, {...surs.fedex}, wtFedEx);
+  const rUPS    = buildCarrier('UPS Saver',     baseUPS,   discUPS,    FUEL.ups,   {...surs.ups},   wtUPS);
+
+  // ── Find best price ──
+  const actives = [
+    {id:'dhl',    r:rDHL,  noService:false},
+    {id:'fedex',  r:rFxIP, noService:fedexNoService},
+    {id:'fedex-e',r:rFxEc, noService:fedexNoService},
+    {id:'ups',    r:rUPS,  noService:upsNoService},
+  ].filter(c=>!c.noService);
+  const minTotal = Math.min(...actives.map(c=>c.r.total));
+
+  // ── Render ──
+  renderResults({
+    country, countryKR: COUNTRY_KR[country]||country, imp,
+    totalActual, totalVol: Math.round(totalVol*100)/100, totalChargeable: Math.round(totalChargeable*100)/100,
+    wtDHL, wtFedEx, wtUPS, dhlZone, fxZone, upsZone,
+    rDHL, rFxIP, rFxEc, rUPS,
+    minTotal, fedexNoService, upsNoService
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════
+function renderResults(d) {
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+
+  document.getElementById('res-title').textContent = (d.imp ? '수입' : '수출') + ' 운임 조회 결과';
+  document.getElementById('res-sub').textContent = `${d.countryKR} (${d.country}) · ${d.imp?'수입':'수출'} · ${isDoc?'서류':'물품'}`;
+
+  document.getElementById('wt-summary').innerHTML = `
+    <div class="wt-chip"><div class="wc-label">실중량</div><div class="wc-val">${d.totalActual.toFixed(1)}<span class="wc-unit"> kg</span></div></div>
+    <div class="wt-chip"><div class="wc-label">부피중량</div><div class="wc-val">${d.totalVol.toFixed(1)}<span class="wc-unit"> kg</span></div></div>
+    <div class="wt-chip"><div class="wc-label">청구중량</div><div class="wc-val">${d.totalChargeable.toFixed(1)}<span class="wc-unit"> kg</span></div></div>
+    <div class="wt-chip"><div class="wc-label">DHL 적용중량</div><div class="wc-val">${d.wtDHL}<span class="wc-unit"> kg</span></div></div>
+    <div class="wt-chip"><div class="wc-label">FedEx 적용중량</div><div class="wc-val">${d.wtFedEx}<span class="wc-unit"> kg</span></div></div>
+    <div class="wt-chip"><div class="wc-label">UPS 적용중량</div><div class="wc-val">${d.wtUPS}<span class="wc-unit"> kg</span></div></div>
+  `;
+
+  const grid = document.getElementById('carrier-grid');
+  grid.innerHTML = '';
+
+  const cards = [
+    { id:'dhl',    cls:'dhl-card',     r:d.rDHL,   name:'DHL Express',   zone:`Zone ${d.dhlZone}`,  days:DHL_DAYS[d.dhlZone-1],        noSvc:false,            color:'var(--dhl-col)' },
+    { id:'fedex',  cls:'fedex-card',   r:d.rFxIP,  name:'FedEx IP',      zone:`Zone ${d.fxZone}`,   days:FEDEX_DAYS_IP[FEDEX_ZONES_LIST.indexOf(d.fxZone)],  noSvc:d.fedexNoService, color:'var(--fedex-col)' },
+    { id:'fedex-e',cls:'fedex-e-card', r:d.rFxEc,  name:'FedEx Economy', zone:`Zone ${d.fxZone}`,   days:FEDEX_DAYS_ECON[FEDEX_ZONES_LIST.indexOf(d.fxZone)],noSvc:d.fedexNoService, color:'#c084fc' },
+    { id:'ups',    cls:'ups-card',     r:d.rUPS,   name:'UPS Saver',     zone:`Zone ${d.upsZone}`,  days:UPS_DAYS[d.upsZone-1],        noSvc:d.upsNoService,   color:'var(--ups-col)' },
+  ];
+
+  cards.forEach((c, i) => {
+    const best = (!c.noSvc) && c.r.total === d.minTotal;
+    const div = document.createElement('div');
+    div.className = `carrier-card ${c.cls}${c.noSvc?' no-service':''}${best?' best-price':''}`;
+    div.style.animationDelay = `${i*0.08}s`;
+
+    const surRows = Object.entries(c.r.surs).map(([k,v]) => `
+      <div class="cc-sur-item"><span>${k}</span><span class="cs-val">${fmtKRW(v)}</span></div>
+    `).join('');
+
+    div.innerHTML = `
+      <div class="cc-header">
+        <div class="cc-name"><span class="cc-dot"></span>${c.name}</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${best ? '<span class="best-badge">최저가</span>' : ''}
+          ${c.noSvc ? '<span style="font-size:11px;color:var(--red);">서비스불가</span>' : ''}
+          <span class="cc-zone">${c.zone}</span>
+        </div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-price">${fmtKRW(c.r.total)}</div>
+        <div class="cc-rows">
+          <div class="cc-row"><span>공시운임 (기본)</span><span class="cr-val">${fmtKRW(c.r.base)}</span></div>
+          <div class="cc-row"><span>할인 후 운임 (${c.r.disc}%)</span><span class="cr-val">${fmtKRW(c.r.pubDisc)}</span></div>
+          <div class="cc-row"><span>유류할증료 (${c.r.fuel}%)</span><span class="cr-val">${fmtKRW(c.r.pubFuel)}</span></div>
+          ${c.r.surTotal > 0 ? `<div class="cc-row"><span>부가서비스 합계</span><span class="cr-val">${fmtKRW(c.r.surTotal + c.r.surFuel)}</span></div>` : ''}
+        </div>
+        ${surRows.length > 0 ? `<div class="cc-surs">${surRows}</div>` : ''}
+        <hr class="cc-divider">
+        <div class="cc-total-row">
+          <span class="cc-total-label">예상 운임 합계</span>
+          <span class="cc-total-val">${fmtKRW(c.r.total)}</span>
+        </div>
+        <div class="cc-days">🕐 예상 소요일: 약 ${c.days}일 · 적용중량: ${c.r.wt} kg</div>
+      </div>
+    `;
+
+    setTimeout(() => div.classList.add('fade-up'), i*80);
+    grid.appendChild(div);
+  });
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════════════════════
+// CT ROW MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function addCT(wt='', L='', W='', H='', qty=1) {
+  const id = ++ctId;
+  ctRows.push({ id, wt, L, W, H, qty });
+  renderCT();
+}
+
+function removeCT(id) {
+  if (ctRows.length <= 1) return;
+  ctRows = ctRows.filter(r => r.id !== id);
+  renderCT();
+}
+
+function updateCT(id, field, val) {
+  const row = ctRows.find(r => r.id === id);
+  if (row) row[field] = val;
+  updateVolume(id);
+}
+
+function updateVolume(id) {
+  const row = ctRows.find(r => r.id === id);
+  if (!row) return;
+  const L = parseFloat(row.L)||0, W = parseFloat(row.W)||0, H = parseFloat(row.H)||0;
+  const vol = L*W*H > 0 ? (L*W*H/5000).toFixed(2) : '--';
+  const el = document.getElementById(`vol-${id}`);
+  if (el) el.textContent = vol + (vol !== '--' ? ' kg' : '');
+}
+
+function renderCT() {
+  const tbody = document.getElementById('ct-tbody');
+  tbody.innerHTML = '';
+  for (const row of ctRows) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="number" value="${row.qty}" min="1" step="1" onchange="updateCT(${row.id},'qty',this.value)" oninput="updateCT(${row.id},'qty',this.value)" style="width:60px;"></td>
+      <td><input type="number" value="${row.wt}"  min="0" step="0.1" placeholder="0.0" onchange="updateCT(${row.id},'wt',this.value)" oninput="updateCT(${row.id},'wt',this.value)"></td>
+      <td><input type="number" value="${row.L}"   min="0" step="1"   placeholder="0"   onchange="updateCT(${row.id},'L',this.value)"  oninput="updateCT(${row.id},'L',this.value)"></td>
+      <td><input type="number" value="${row.W}"   min="0" step="1"   placeholder="0"   onchange="updateCT(${row.id},'W',this.value)"  oninput="updateCT(${row.id},'W',this.value)"></td>
+      <td><input type="number" value="${row.H}"   min="0" step="1"   placeholder="0"   onchange="updateCT(${row.id},'H',this.value)"  oninput="updateCT(${row.id},'H',this.value)"></td>
+      <td class="ct-vol" id="vol-${row.id}">--</td>
+      <td><button class="btn-del" onclick="removeCT(${row.id})" title="삭제">×</button></td>
+    `;
+    tbody.appendChild(tr);
+    updateVolume(row.id);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TOGGLE
+// ══════════════════════════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-export').classList.toggle('active', m==='수출');
+  document.getElementById('btn-import').classList.toggle('active', m==='수입');
+}
+
+function setDocType(doc) {
+  isDoc = doc;
+  document.getElementById('btn-doc').classList.toggle('active', doc);
+  document.getElementById('btn-ndc').classList.toggle('active', !doc);
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function initCountries() {
+  const sel = document.getElementById('dest-country');
+  const countries = Object.keys(DHL_ZONE_MAP).sort();
+  for (const c of countries) {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = `${COUNTRY_KR[c]||c} (${c})`;
+    sel.appendChild(opt);

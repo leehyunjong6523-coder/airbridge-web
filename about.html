@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회사소개 — 에어브리지 국제특송</title>
+<meta name="description" content="에어브리지 국제특송 회사소개. DHL 공식 총대리점, 인천·부천·안산 담당. 항공특급·항공화물·해상화물 전문.">
+<link rel="stylesheet" href="style.css">
+<style>
+.page-hero {
+  padding: 72px 0 60px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+}
+.page-hero-tag { font-size:11px; font-family:var(--mono); color:var(--cyan); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+.page-hero h1 { font-size: clamp(28px, 4vw, 48px); font-weight:900; letter-spacing:-1px; margin-bottom:14px; }
+.page-hero p  { font-size:15px; color:var(--muted); max-width:560px; line-height:1.8; }
+
+/* MISSION */
+.mission-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.mission-text h2 { font-size: clamp(24px,3vw,36px); font-weight:900; letter-spacing:-0.5px; margin-bottom:20px; }
+.mission-text p  { font-size:14px; color:var(--muted); line-height:1.85; margin-bottom:14px; }
+
+.mission-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.mc-item { display:flex; gap:14px; align-items:flex-start; }
+.mc-icon { font-size:24px; flex-shrink:0; line-height:1; }
+.mc-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+.mc-desc  { font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* VALUES */
+.values-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:40px; }
+.val-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.val-card:hover { border-color:var(--cyan-dim); transform:translateY(-3px); }
+.val-icon { font-size:36px; margin-bottom:14px; }
+.val-title { font-size:16px; font-weight:700; margin-bottom:8px; }
+.val-desc  { font-size:13px; color:var(--muted); line-height:1.7; }
+
+/* HISTORY */
+.history-list { display:flex; flex-direction:column; gap:0; margin-top:40px; position:relative; }
+.history-list::before {
+  content:'';
+  position:absolute;
+  left: 80px; top:0; bottom:0;
+  width: 1px;
+  background: var(--border);
+}
+.history-item { display:flex; gap:32px; align-items:flex-start; padding:24px 0; }
+.history-year {
+  flex-shrink:0;
+  width:80px;
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:600;
+  color:var(--cyan);
+  padding-top:3px;
+  text-align:right;
+  padding-right:24px;
+  position:relative;
+}
+.history-year::after {
+  content:'';
+  position:absolute;
+  right:-5px; top:8px;
+  width:10px; height:10px;
+  border-radius:50%;
+  background:var(--cyan-dim);
+  border:2px solid var(--bg);
+}
+.history-content { flex:1; }
+.history-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+.history-desc  { font-size:13px; color:var(--muted); line-height:1.7; }
+
+/* TEAM */
+.team-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:40px; }
+.team-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:28px 24px;
+  display:flex; flex-direction:column; gap:12px;
+}
+.team-avatar {
+  width:52px; height:52px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--cyan-dim),#6366f1);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; font-weight:900; color:#fff;
+  font-family:var(--display);
+}
+.team-name  { font-size:16px; font-weight:700; }
+.team-role  { font-size:12px; color:var(--cyan); font-family:var(--mono); }
+.team-area  { font-size:13px; color:var(--muted); }
+
+/* CTA */
+.about-cta {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:32px;
+  margin-top:40px;
+}
+.about-cta h3 { font-size:22px; font-weight:900; margin-bottom:8px; }
+.about-cta p  { font-size:14px; color:var(--muted); }
+.about-cta-btns { display:flex; gap:12px; flex-shrink:0; }
+
+@media(max-width:900px){
+  .mission-grid { grid-template-columns:1fr; }
+  .values-grid  { grid-template-columns:1fr 1fr; }
+  .team-grid    { grid-template-columns:1fr; }
+  .about-cta    { flex-direction:column; text-align:center; padding:32px 24px; }
+  .about-cta-btns { justify-content:center; }
+}
+@media(max-width:600px){
+  .values-grid { grid-template-columns:1fr; }
+  .history-list::before { left:60px; }
+  .history-year { width:60px; font-size:11px; }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag anim-fadeup">About Us</div>
+      <h1 class="anim-fadeup anim-d1">에어브리지를 <span class="highlight">소개합니다</span></h1>
+      <p class="anim-fadeup anim-d2">DHL 공식 총대리점으로 인천·부천·안산 지역을 담당하며, 항공특급·항공화물·해상화물 서비스를 제공하는 국제물류 전문기업입니다.</p>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <section class="section">
+    <div class="container">
+      <div class="mission-grid">
+        <div class="mission-text anim-fadeup">
+          <div class="section-tag">Our Mission</div>
+          <h2>고객의 화물이<br><span class="highlight">안전하게 도착</span>할 때까지</h2>
+          <p>에어브리지 국제특송은 단순한 운송을 넘어 고객의 비즈니스 파트너로서 최적의 물류 솔루션을 제공합니다. 수출입 통관부터 최종 배달까지, 모든 과정에서 전문성과 신뢰를 바탕으로 서비스를 운영합니다.</p>
+          <p>DHL Express 공식 총대리점으로서 업계 최고 수준의 할인율과 전담 CS 서비스를 제공하며, FedEx·UPS와의 협력을 통해 다양한 운송 옵션을 한 곳에서 비교·선택하실 수 있습니다.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
+            <span class="chip">✈ 항공특급</span>
+            <span class="chip">🛩 항공화물</span>
+            <span class="chip">🚢 해상화물</span>
+            <span class="chip">📋 통관 컨설팅</span>
+          </div>
+        </div>
+        <div class="mission-card anim-fadeup anim-d2">
+          <div class="mc-item">
+            <div class="mc-icon">🏆</div>
+            <div>
+              <div class="mc-title">DHL 공식 총대리점</div>
+              <div class="mc-desc">인천·부천·안산 담당 DHL Express 공식 총대리점. 직접 계약 기반의 최고 할인율 제공.</div>
+            </div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-icon">🌐</div>
+            <div>
+              <div class="mc-title">230개국 글로벌 네트워크</div>
+              <div class="mc-desc">DHL·FedEx·UPS를 통해 전 세계 230개국으로 배송 가능. 미취항 지역도 대안 운송 제공.</div>
+            </div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-icon">⚡</div>
+            <div>
+              <div class="mc-title">실시간 운임 비교</div>
+              <div class="mc-desc">자체 개발 운임 계산기로 5개 옵션(DHL·FedEx IP/Economy·UPS 2계정) 즉시 비교.</div>
+            </div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-icon">🤝</div>
+            <div>
+              <div class="mc-title">전담 CS 담당자</div>
+              <div class="mc-desc">고객사별 전담 담당자 배정. 픽업부터 배송완료까지 전 과정 원스톱 관리.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="section-tag">Our Values</div>
+      <h2 class="section-title"><span class="highlight">핵심 가치</span></h2>
+      <div class="values-grid">
+        <div class="val-card anim-fadeup anim-d1">
+          <div class="val-icon">🎯</div>
+          <div class="val-title">정확성</div>
+          <div class="val-desc">픽업부터 배달까지 정확한 시간과 상태로 화물을 관리합니다. 운임 계산과 통관 서류도 오차 없이 처리합니다.</div>
+        </div>
+        <div class="val-card anim-fadeup anim-d2">
+          <div class="val-icon">🔒</div>
+          <div class="val-title">신뢰성</div>
+          <div class="val-desc">DHL 공식 총대리점으로서 검증된 글로벌 네트워크를 기반으로 안전하고 신뢰할 수 있는 서비스를 제공합니다.</div>
+        </div>
+        <div class="val-card anim-fadeup anim-d3">
+          <div class="val-icon">💡</div>
+          <div class="val-title">투명성</div>
+          <div class="val-desc">숨겨진 비용 없이 실시간 운임 계산기를 통해 모든 요금을 명확하게 공개합니다. 견적부터 청구까지 투명하게.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="section">
+    <div class="container">
+      <div class="section-tag">History</div>
+      <h2 class="section-title">에어브리지의 <span class="highlight">발자취</span></h2>
+      <div class="history-list">
+        <div class="history-item anim-fadeup">
+          <div class="history-year">창업</div>
+          <div class="history-content">
+            <div class="history-title">에어브리지 국제특송 설립</div>
+            <div class="history-desc">인천을 기반으로 국제특송 전문 회사 설립. DHL Express 대리점 계약 체결.</div>
+          </div>
+        </div>
+        <div class="history-item anim-fadeup anim-d1">
+          <div class="history-year">성장기</div>
+          <div class="history-content">
+            <div class="history-title">DHL 총대리점 승격 · FedEx·UPS 추가</div>
+            <div class="history-desc">DHL Express 인천·부천·안산 총대리점 승격. FedEx, UPS 서비스 추가로 멀티캐리어 체계 구축.</div>
+          </div>
+        </div>
+        <div class="history-item anim-fadeup anim-d2">
+          <div class="history-year">확장</div>
+          <div class="history-content">
+            <div class="history-title">항공화물 · 해상화물 서비스 확대</div>
+            <div class="history-desc">항공특급을 넘어 항공화물(Air Freight)과 해상화물(LCL·FCL) 서비스 도입. 원스톱 물류 서비스 완성.</div>
+          </div>
+        </div>
+        <div class="history-item anim-fadeup anim-d3">
+          <div class="history-year">현재</div>
+          <div class="history-content">
+            <div class="history-title">디지털 전환 · 운임 계산기 오픈</div>
+            <div class="history-desc">자체 운임 계산 시스템 개발. DHL·FedEx·UPS 5개 옵션 실시간 비교, 수출·수입 전 구간 즉시 견적 제공.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="section-tag">Our Team</div>
+      <h2 class="section-title">함께하는 <span class="highlight">팀</span></h2>
+      <div class="team-grid">
+        <div class="team-card anim-fadeup anim-d1">
+          <div class="team-avatar">호</div>
+          <div>
+            <div class="team-name">호영준</div>
+            <div class="team-role">대표이사 · CEO</div>
+            <div class="team-area" style="margin-top:8px;">항공특급·해상화물 총괄<br>cs@airos.co.kr</div>
+          </div>
+        </div>
+        <div class="team-card anim-fadeup anim-d2">
+          <div class="team-avatar">이</div>
+          <div>
+            <div class="team-name">이현종</div>
+            <div class="team-role">영업 팀장</div>
+            <div class="team-area" style="margin-top:8px;">수출입 영업 · 고객 관리<br>DHL·FedEx 담당</div>
+          </div>
+        </div>
+        <div class="team-card anim-fadeup anim-d3">
+          <div class="team-avatar">양</div>
+          <div>
+            <div class="team-name">양희석</div>
+            <div class="team-role">영업 담당</div>
+            <div class="team-area" style="margin-top:8px;">UPS·항공화물 담당<br>신규 고객 개발</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-sm">
+    <div class="container">
+      <div class="about-cta anim-fadeup">
+        <div>
+          <h3>파트너가 되어 주세요</h3>
+          <p>지금 바로 문의하시거나 운임을 직접 계산해 보세요.</p>
+        </div>
+        <div class="about-cta-btns">
+          <a href="/calculator.html" class="btn btn-primary">✈ 운임 계산기</a>
+          <a href="/contact.html" class="btn btn-outline">📞 문의하기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="common.js"></script>
+</body>
+</html>
