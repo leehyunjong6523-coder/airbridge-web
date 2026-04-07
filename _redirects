@@ -8,4 +8,4 @@
 /contact        /contact.html   200
 
 # 404 처리
-/*              /index.html     404
+/*              /index.html     200
