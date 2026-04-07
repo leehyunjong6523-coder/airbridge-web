@@ -25,9 +25,21 @@
 .slide.active { opacity: 0.35; }
 
 /* 대표님 파일명 (공백 없음) */
-#slide1 { background-image: url('https://images.unsplash.com/photo-1542296332-2e4473faf563?q=80&w=1000&auto=format&fit=crop'); } 
-#slide2 { background-image: url('https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?q=80&w=1000&auto=format&fit=crop'); }
-#slide3 { background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed745eb33?q=80&w=1000&auto=format&fit=crop'); }
+/* 슬라이드 이미지 경로를 외부 주소로 변경 */
+#slide1 { 
+    background-image: url('https://images.unsplash.com/photo-1542296332-2e4473faf563?q=80&w=1600&auto=format&fit=crop'); 
+} 
+#slide2 { 
+    background-image: url('https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?q=80&w=1600&auto=format&fit=crop'); 
+}
+#slide3 { 
+    background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed745eb33?q=80&w=1600&auto=format&fit=crop'); 
+}
+
+/* 배경이 잘 보이도록 투명도 조정 (기존 0.3에서 0.5로 상향) */
+.slide.active { 
+    opacity: 0.5; 
+}
 
 /* ── HERO ── */
 .hero {
