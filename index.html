@@ -4,25 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>에어브리지 국제특송 — 글로벌 특송 전문 (DHL·FedEx·UPS)</title>
+<meta name="description" content="에어브리지 국제특송은 글로벌 특송사(DHL, FedEx, UPS)와 함께 항공특급, 항공화물, 해상화물 서비스를 제공합니다.">
 <link rel="stylesheet" href="style.css">
 <style>
-/* ── Hero 섹션 레이아웃 (배경 슬라이드 통합) ── */
-.hero {
-  min-height: calc(100vh - var(--nav-h));
-  display: flex;
-  align-items: center;
-  padding: 80px 0;
-  position: relative;
-  overflow: hidden; /* 슬라이드가 영역 밖으로 나가지 않도록 */
-  background: #0b1120; /* 사진 로딩 전 기본 어두운 배경 */
-}
-
 /* ── 배경 슬라이드 시스템 (Hero 안으로 이동하여 무조건 보이게 픽스) ── */
 .bg-slider {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: 1; /* 가장 밑바닥에 깔기 */
+    z-index: 1; 
 }
 .slide {
     position: absolute;
@@ -32,75 +22,319 @@
     opacity: 0;
     transition: opacity 2s ease-in-out;
 }
-.slide.active { opacity: 0.35; } /* 투명도를 살짝 올려 더 잘 보이게 조정 */
+.slide.active { opacity: 0.35; }
 
-/* 대표님이 방금 주신 파일명 기준 (공백 없음) 
-   혹시 실제 파일명에 공백이 있다면 'Cargo Plane.png' 처럼 띄어쓰기를 꼭 맞춰주세요! */
+/* 대표님 파일명 (공백 없음) */
 #slide1 { background-image: url('./CargoPlane.png'); } 
 #slide2 { background-image: url('./CargoShip.png'); }
 #slide3 { background-image: url('./CargoTruck.png'); }
 
-/* 기존 격자 무늬 배경 */
-.hero-bg, .hero-grid { 
-    position: absolute; inset: 0; z-index: 2; opacity: 0.3; pointer-events: none; 
+/* ── HERO ── */
+.hero {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0;
+  background: #0b1120;
 }
-
-/* ── 메인 콘텐츠 ── */
-.hero-content { 
-    position: relative; 
-    z-index: 10; /* 배경보다 확실히 위로 올라오게 설정 */
-    max-width: 800px; /* 통계 박스가 가로로 뻗을 수 있도록 공간 확장 */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 70% 50%, rgba(14,116,144,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(99,102,241,0.1) 0%, transparent 60%);
+  z-index: 2;
+  opacity: 0.4;
+  pointer-events: none;
 }
-.hero-badge { 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 8px; 
-    background: rgba(34,211,238,0.1); 
-    border: 1px solid rgba(34,211,238,0.25); 
-    border-radius: 20px; 
-    padding: 5px 14px; 
-    font-size: 12px; 
-    color: var(--cyan); 
-    margin-bottom: 28px; 
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42,51,71,0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,51,71,0.4) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 80%);
+  z-index: 2;
+  opacity: 0.4;
+  pointer-events: none;
 }
-.hero-title { font-size: clamp(34px, 5vw, 64px); font-weight: 900; line-height: 1.1; margin-bottom: 24px; color: #ffffff; }
-.hero-title em { font-style: normal; color: var(--cyan); display: block; }
-.hero-sub { font-size: 16px; color: rgba(255, 255, 255, 0.7); line-height: 1.8; margin-bottom: 40px; }
-.hero-btns { display: flex; gap: 12px; }
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34,211,238,0.1);
+  border: 1px solid rgba(34,211,238,0.25);
+  border-radius: 20px;
+  padding: 5px 14px 5px 10px;
+  font-size: 12px;
+  color: var(--cyan);
+  font-family: var(--mono);
+  margin-bottom: 28px;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  animation: pulse-cyan 2s ease-in-out infinite;
+}
+.hero-title {
+  font-size: clamp(34px, 5vw, 64px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+.hero-title em {
+  font-style: normal;
+  color: var(--cyan);
+  display: block;
+}
+.hero-sub {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+  margin-bottom: 40px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* ── 새롭게 디자인된 통계 섹션 (가로 배치 & 역동적 애니메이션) ── */
 .hero-stats { 
     display: flex; 
-    flex-direction: row; /* 가로 배치 */
+    flex-direction: row; 
     gap: 20px; 
-    margin-top: 50px; /* 버튼 아래로 이동 */
+    margin-top: 50px; 
     flex-wrap: wrap;
 }
 .hero-stat { 
-    background: rgba(255, 255, 255, 0.05); /* 고급스러운 반투명 유리 효과 */
+    background: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1); 
     border-radius: 16px; 
     padding: 20px 24px; 
     text-align: left; 
-    flex: 1; /* 박스 크기 균등 분할 */
-    min-width: 200px; 
-    transition: transform 0.3s ease, background 0.3s ease; /* 마우스 오버 시 부드러운 애니메이션 */
+    flex: 1; 
+    min-width: 180px; 
+    transition: transform 0.3s ease, background 0.3s ease; 
 }
 .hero-stat:hover {
-    transform: translateY(-8px); /* 위로 살짝 떠오르는 역동적 효과 */
+    transform: translateY(-8px); 
     background: rgba(255, 255, 255, 0.1);
 }
-.hero-stat-num { font-size: 28px; font-weight: 900; color: var(--cyan); }
+.hero-stat-num { font-size: 28px; font-weight: 900; font-family: var(--mono); color: var(--cyan); letter-spacing: -1px; }
 .hero-stat-label { font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-top: 6px; }
 
-.section { padding: 80px 0; }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+/* ── CARRIERS ── */
+.carriers-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+}
+.carriers-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.carrier-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 32px;
+  border-right: 1px solid var(--border);
+}
+.carrier-item:last-child { border-right: none; }
+.carrier-dot { width: 10px; height: 10px; border-radius: 50%; }
+.carrier-name { font-size: 14px; font-weight: 700; }
+.carrier-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* ── SERVICES ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+.svc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.svc-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.svc-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+.svc-card:hover::before { opacity: 1; }
+.svc-card.s1::before { background: #ef4444; }
+.svc-card.s2::before { background: #a855f7; }
+.svc-card.s3::before { background: #f97316; }
+.svc-card.s4::before { background: var(--cyan); }
+.svc-card.s5::before { background: var(--green); }
+.svc-card.s6::before { background: var(--amber); }
+.svc-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+  display: block;
+}
+.svc-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.svc-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.svc-tag {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted2);
+  background: var(--surface2);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* ── WHY ── */
+.why-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  margin-top: 48px;
+}
+.why-list { display: flex; flex-direction: column; gap: 20px; }
+.why-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.why-num {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border: 1px solid var(--cyan-dim);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+.why-item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.why-item-desc  { font-size: 13px; color: var(--muted); }
+
+.why-visual {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.wv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-radius: 10px;
+}
+.wv-label { font-size: 13px; color: var(--muted); }
+.wv-val   { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+.wv-cyan  { color: var(--cyan); }
+.wv-amber { color: var(--amber); }
+.wv-green { color: var(--green); }
+
+/* ── CTA BANNER ── */
+.cta-banner {
+  background: linear-gradient(135deg, var(--cyan-dim) 0%, #1e3a5f 100%);
+  border-radius: 24px;
+  padding: 60px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+  margin: 40px 0;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  right: -60px; top: -60px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.cta-title { font-size: clamp(22px, 3vw, 32px); font-weight: 900; letter-spacing: -0.5px; color: #fff; }
+.cta-sub   { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+.cta-btns  { display: flex; gap: 12px; flex-shrink: 0; }
+.cta-btn-w {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #fff;
+  color: var(--cyan-dim);
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.cta-btn-w:hover { opacity: 0.9; }
+.cta-btn-o {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.cta-btn-o:hover { background: rgba(255,255,255,0.1); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-stats { flex-direction: column; }
+  .services-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr; }
+  .cta-banner { flex-direction: column; text-align: center; padding: 40px 24px; }
+  .cta-btns { justify-content: center; flex-wrap: wrap; }
+  .carriers-inner { justify-content: flex-start; }
+  .carrier-item { border-right: none; padding: 8px 16px; }
+}
+@media (max-width: 600px) {
+  .services-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
-
 <div class="page-wrap">
+
   <section class="hero">
     <div class="bg-slider">
         <div class="slide active" id="slide1"></div>
@@ -109,39 +343,209 @@
     </div>
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
-    
     <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge">글로벌 특송 파트너 — DHL · FedEx · UPS</div>
-        <h1 class="hero-title">더 넓은 세상으로<br><em>가장 빠른 연결</em></h1>
-        <p class="hero-sub">에어브리지 국제특송은 글로벌 톱 클래스 특송사와 함께하며<br>기업 물류부터 개인 택배까지 최적의 운송 솔루션을 제공합니다.</p>
-        <div class="hero-btns">
-          <a href="#" class="btn btn-primary">✈ 실시간 운임조회</a>
-          <a href="#" class="btn btn-outline">📞 비즈니스 상담</a>
+      <div class="hero-content anim-fadeup">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          글로벌 특송 파트너 — DHL · FedEx · UPS
         </div>
-        
-        <div class="hero-stats">
+        <h1 class="hero-title">
+          더 넓은 세상으로<br>
+          <em>가장 빠른 연결</em>
+        </h1>
+        <p class="hero-sub">
+          에어브리지 국제특송은 글로벌 톱 클래스 특송사와 함께하며<br>
+          기업 물류부터 개인 택배까지 최적의 운송 솔루션을 제공합니다.
+        </p>
+        <div class="hero-btns">
+          <a href="/calculator.html" class="btn btn-primary btn-lg">✈ 실시간 운임조회</a>
+          <a href="/contact.html" class="btn btn-outline btn-lg">📞 비즈니스 상담</a>
+        </div>
+
+        <div class="hero-stats anim-fadeup anim-d3">
           <div class="hero-stat">
-              <div class="hero-stat-num">230+</div>
-              <div class="hero-stat-label">서비스 배송 가능 국가</div>
+            <div class="hero-stat-num">230<span style="font-size:16px;">+</span></div>
+            <div class="hero-stat-label">서비스 배송 가능 국가</div>
           </div>
           <div class="hero-stat">
-              <div class="hero-stat-num">Express</div>
-              <div class="hero-stat-label">DHL · FedEx · UPS 정식 연계</div>
+            <div class="hero-stat-num">Express</div>
+            <div class="hero-stat-label">DHL · FedEx · UPS 정식 연계</div>
           </div>
           <div class="hero-stat">
-              <div class="hero-stat-num">1일~</div>
-              <div class="hero-stat-label">전 세계 최단 배송일 보장</div>
+            <div class="hero-stat-num">1<span style="font-size:16px;">일~</span></div>
+            <div class="hero-stat-label">전 세계 최단 배송일 보장</div>
           </div>
         </div>
       </div>
     </div>
   </section>
-  
+
+  <div class="carriers-bar">
+    <div class="carriers-inner">
+      <div class="carrier-item">
+        <div class="carrier-dot" style="background:#ef4444;"></div>
+        <div>
+          <div class="carrier-name" style="color:#ef4444;">DHL Express</div>
+          <div class="carrier-desc">공식 총대리점</div>
+        </div>
+      </div>
+      <div class="carrier-item">
+        <div class="carrier-dot" style="background:#a855f7;"></div>
+        <div>
+          <div class="carrier-name" style="color:#a855f7;">FedEx</div>
+          <div class="carrier-desc">IP · Economy</div>
+        </div>
+      </div>
+      <div class="carrier-item">
+        <div class="carrier-dot" style="background:#f97316;"></div>
+        <div>
+          <div class="carrier-name" style="color:#f97316;">UPS</div>
+          <div class="carrier-desc">Worldwide Saver</div>
+        </div>
+      </div>
+      <div class="carrier-item">
+        <div class="carrier-dot" style="background:var(--cyan);"></div>
+        <div>
+          <div class="carrier-name" style="color:var(--cyan);">항공화물</div>
+          <div class="carrier-desc">Air Freight</div>
+        </div>
+      </div>
+      <div class="carrier-item">
+        <div class="carrier-dot" style="background:var(--green);"></div>
+        <div>
+          <div class="carrier-name" style="color:var(--green);">해상화물</div>
+          <div class="carrier-desc">Ocean Freight</div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <section class="section">
+    <div class="container">
+      <div class="section-tag anim-fadeup">Services</div>
+      <h2 class="section-title anim-fadeup anim-d1">에어브리지의 <span class="highlight">모든 서비스</span></h2>
+      <p class="section-sub anim-fadeup anim-d2">항공특급부터 해상화물까지, 화물의 크기와 목적지에 맞는 최적의 운송 방법을 제안합니다.</p>
+      <div class="services-grid">
+        <div class="svc-card s1 anim-fadeup anim-d1">
+          <span class="svc-icon">🚀</span>
+          <div class="svc-title">DHL Express</div>
+          <div class="svc-desc">전 세계 230개국 1~5일 배송. 에어브리지는 DHL 공식 총대리점으로 최고의 할인율과 전담 CS를 제공합니다.</div>
+          <span class="svc-tag">인천·부천·안산 담당</span>
+        </div>
+        <div class="svc-card s2 anim-fadeup anim-d2">
+          <span class="svc-icon">✈️</span>
+          <div class="svc-title">FedEx IP · Economy</div>
+          <div class="svc-desc">FedEx International Priority와 Economy 서비스. Zone A~J 전 구간 운임 조회 및 실시간 견적 제공.</div>
+          <span class="svc-tag">Zone A~J 전 구간</span>
+        </div>
+        <div class="svc-card s3 anim-fadeup anim-d3">
+          <span class="svc-icon">📦</span>
+          <div class="svc-title">UPS Worldwide Saver</div>
+          <div class="svc-desc">UPS 특송 서비스 운영으로 최적 운임 비교. 중량화물 Freight 전환 가능.</div>
+          <span class="svc-tag">최적 운임 비교</span>
+        </div>
+        <div class="svc-card s4 anim-fadeup anim-d1">
+          <span class="svc-icon">🛩️</span>
+          <div class="svc-title">항공화물</div>
+          <div class="svc-desc">100kg 이상 대형화물에 최적화된 항공화물 서비스. 혼재화물(LCL)부터 전세기까지 처리 가능.</div>
+          <span class="svc-tag">100kg~</span>
+        </div>
+        <div class="svc-card s5 anim-fadeup anim-d2">
+          <span class="svc-icon">🚢</span>
+          <div class="svc-title">해상화물</div>
+          <div class="svc-desc">LCL(혼재) · FCL(컨테이너) 해상화물 서비스. 비용 절감이 중요한 대량·대형 화물에 적합.</div>
+          <span class="svc-tag">LCL · FCL</span>
+        </div>
+        <div class="svc-card s6 anim-fadeup anim-d3">
+          <span class="svc-icon">📋</span>
+          <div class="svc-title">통관 · 수출입 컨설팅</div>
+          <div class="svc-desc">수출입 통관 서류 가이드, HS Code 확인, INCOTERMS 조건별 운임 계산 등 종합 물류 컨설팅.</div>
+          <span class="svc-tag">원스톱 서비스</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="section-tag">Why Airbridge</div>
+      <h2 class="section-title">에어브리지를 <span class="highlight">선택하는 이유</span></h2>
+      <div class="why-grid">
+        <div class="why-list">
+          <div class="why-item anim-fadeup anim-d1">
+            <div class="why-num">01</div>
+            <div>
+              <div class="why-item-title">DHL 공식 총대리점</div>
+              <div class="why-item-desc">에어브리지는 DHL Express의 인천·부천·안산 공식 총대리점입니다. 직접 계약을 통한 최고 수준의 할인율을 제공합니다.</div>
+            </div>
+          </div>
+          <div class="why-item anim-fadeup anim-d2">
+            <div class="why-num">02</div>
+            <div>
+              <div class="why-item-title">다중 운송사 비교 견적</div>
+              <div class="why-item-desc">DHL · FedEx IP/Economy · UPS 옵션을 동시에 비교하여 가장 경제적인 운송 방법을 선택할 수 있습니다.</div>
+            </div>
+          </div>
+          <div class="why-item anim-fadeup anim-d3">
+            <div class="why-num">03</div>
+            <div>
+              <div class="why-item-title">실시간 운임 계산기</div>
+              <div class="why-item-desc">수출·수입 전 구간, 서류·물품 구분, 할인율 직접 입력까지. 공식 운임표 기반 즉시 견적 확인.</div>
+            </div>
+          </div>
+          <div class="why-item anim-fadeup anim-d4">
+            <div class="why-num">04</div>
+            <div>
+              <div class="why-item-title">전담 CS 담당자 배정</div>
+              <div class="why-item-desc">고객사별 전담 담당자가 배정되어 픽업 예약부터 배송 추적, 통관 이슈까지 원스톱으로 해결합니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="why-visual anim-fadeup anim-d2">
+          <div style="font-size:12px;font-family:var(--mono);color:var(--muted2);margin-bottom:4px;">// 실시간 운임 비교 예시 (5kg / 미국)</div>
+          <div class="wv-row">
+            <div class="wv-label"><span style="color:#ef4444;">●</span> DHL Express</div>
+            <div class="wv-val wv-cyan">₩309,100</div>
+          </div>
+          <div class="wv-row">
+            <div class="wv-label"><span style="color:#a855f7;">●</span> FedEx IP</div>
+            <div class="wv-val wv-amber">₩281,200</div>
+          </div>
+          <div class="wv-row">
+            <div class="wv-label"><span style="color:#c084fc;">●</span> FedEx Economy</div>
+            <div class="wv-val wv-green">₩278,000</div>
+          </div>
+          <div class="wv-row">
+            <div class="wv-label"><span style="color:#f97316;">●</span> UPS Saver</div>
+            <div class="wv-val" style="color:var(--text);">₩333,900</div>
+          </div>
+          <div style="margin-top:8px;padding:12px 16px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.15);border-radius:8px;">
+            <div style="font-size:11px;color:var(--muted);font-family:var(--mono);">유류할증료 포함 / 할인율 별도</div>
+            <a href="/calculator.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;font-weight:600;color:var(--cyan);">직접 계산해보기 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="cta-banner">
+        <div>
+          <div class="cta-title">지금 바로 운임을 계산해보세요</div>
+          <div class="cta-sub">DHL · FedEx · UPS 실시간 비교 견적 · 수출·수입 모두 지원</div>
+        </div>
+        <div class="cta-btns">
+          <a href="/calculator.html" class="cta-btn-w">✈ 운임 계산기</a>
+          <a href="tel:032-502-1880" class="cta-btn-o">📞 전화 문의</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><script src="common.js"></script>
 <script>
-    // 배경 슬라이드 자동 전환 스크립트
+    // 배경 슬라이드 스크립트
     let currentIdx = 0;
     const slides = document.querySelectorAll('.slide');
 
