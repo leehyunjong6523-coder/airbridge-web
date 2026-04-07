@@ -3,10 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>에어브리지 국제특송 — DHL 총대리점 (인천·부천·안산)</title>
-<meta name="description" content="에어브리지 국제특송은 DHL 총대리점으로 항공특급, 항공화물, 해상화물 서비스를 제공합니다. 빠르고 정확한 국제특송 전문기업.">
+<title>에어브리지 국제특송 — DHL Fedex UPS 총대리점 (인천·부천·안산)</title>
+<meta name="description" content="에어브리지 국제특송은 DHL Fedex UPS 총대리점으로 항공특급, 항공화물, 해상화물 서비스를 제공합니다. 빠르고 정확한 국제특송 전문기업.">
 <link rel="stylesheet" href="style.css">
 <style>
+/* ── 배경 슬라이드 시스템 (추가됨) ── */
+.bg-slider {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2; /* 가장 뒤로 */
+    background-color: #0b0f1a; /* 어두운 기본 배경색 */
+}
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+/* 투명도 30% 적용 */
+.slide.active { opacity: 0.3; }
+
+/* 대표님의 파일명 (공백 포함 시 반드시 따옴표 사용) */
+#slide1 { background-image: url('./Cargo Plane.png'); } 
+#slide2 { background-image: url('./Cargo Ship.png'); }
+#slide3 { background-image: url('./Cargo Truck.png'); }
+
 /* ── HERO ── */
 .hero {
   min-height: calc(100vh - var(--nav-h));
@@ -15,6 +39,7 @@
   position: relative;
   overflow: hidden;
   padding: 80px 0;
+  background: transparent; /* 배경 슬라이드를 보여주기 위해 투명화 */
 }
 .hero-bg {
   position: absolute;
@@ -22,6 +47,7 @@
   background:
     radial-gradient(ellipse 70% 60% at 70% 50%, rgba(14,116,144,0.18) 0%, transparent 70%),
     radial-gradient(ellipse 40% 40% at 20% 80%, rgba(99,102,241,0.1) 0%, transparent 60%);
+  z-index: -1;
 }
 .hero-grid {
   position: absolute;
@@ -31,6 +57,7 @@
     linear-gradient(90deg, rgba(42,51,71,0.4) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 80%);
+  z-index: -1;
 }
 .hero-content {
   position: relative;
@@ -307,9 +334,14 @@
 </style>
 </head>
 <body>
+<div class="bg-slider">
+    <div class="slide active" id="slide1"></div>
+    <div class="slide" id="slide2"></div>
+    <div class="slide" id="slide3"></div>
+</div>
+
 <div class="page-wrap">
 
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
@@ -334,7 +366,6 @@
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="hero-stats anim-fadeup anim-d3">
         <div class="hero-stat">
           <div class="hero-stat-num">230<span style="font-size:16px;">+</span></div>
@@ -352,7 +383,6 @@
     </div>
   </section>
 
-  <!-- CARRIERS BAR -->
   <div class="carriers-bar">
     <div class="carriers-inner">
       <div class="carrier-item">
@@ -393,7 +423,6 @@
     </div>
   </div>
 
-  <!-- SERVICES -->
   <section class="section">
     <div class="container">
       <div class="section-tag anim-fadeup">Services</div>
@@ -440,7 +469,6 @@
     </div>
   </section>
 
-  <!-- WHY AIRBRIDGE -->
   <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
     <div class="container">
       <div class="section-tag">Why Airbridge</div>
@@ -503,7 +531,6 @@
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="section-sm">
     <div class="container">
       <div class="cta-banner">
@@ -519,7 +546,20 @@
     </div>
   </section>
 
-</div><!-- /page-wrap -->
+</div><script>
+    let currentSlideIdx = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function startBackgroundSlide() {
+        slides[currentSlideIdx].classList.remove('active');
+        currentSlideIdx = (currentSlideIdx + 1) % slides.length;
+        slides[currentSlideIdx].classList.add('active');
+    }
+
+    // 6초마다 배경 교체 (부드러운 전환을 위해 여유 있게 설정)
+    setInterval(startBackgroundSlide, 6000);
+</script>
+
 <script src="common.js"></script>
 </body>
 </html>
