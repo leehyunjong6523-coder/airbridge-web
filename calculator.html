@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>에어브리지 국제특송 — 운임 계산기</title>
-<link rel="stylesheet" href="style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -42,12 +41,12 @@ body {
 }
 
 /* ── HEADER ── */
-.old-header-disabled {
+.header {
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, #111827 0%, var(--bg) 100%);
   padding: 0 32px;
 }
-.old-header-inner-disabled {
+.header-inner {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -532,7 +531,7 @@ select.form-control option { background: var(--surface); }
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .container { padding: 20px 16px 60px; }
-  .old-header-disabled { padding: 0 16px; }
+  .header { padding: 0 16px; }
   .header-info { display: none; }
   .carrier-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr 1fr; }
@@ -583,10 +582,23 @@ select.form-control option { background: var(--surface); }
 </style>
 </head>
 <body>
-<div class="page-wrap" style="padding-top:var(--nav-h);">
 
-<!-- HEADER (replaced by common.js) -->
-<!-- nav injected by common.js -->
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">AB</div>
+      <div>
+        <div class="logo-text">에어브리지 국제특송</div>
+        <div class="logo-sub">AIRBRIDGE Co., Ltd.</div>
+      </div>
+    </div>
+    <div class="header-info">
+      <div>032-502-1880 &nbsp;|&nbsp; <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="22415162434b504d510c414d0c4950">[email&#160;protected]</a></span></div>
+      <div>DHL 총대리점 (인천·부천·안산)</div>
+    </div>
+  </div>
+</header>
 
 <div class="container">
 
@@ -714,7 +726,7 @@ select.form-control option { background: var(--surface); }
     <div class="disclaimer">
       <strong>안내사항</strong><br>
       본 계산기는 예상 운임 참고용이며, 실제 청구 금액은 화물 실측·운송사 정책·서비스 조건에 따라 달라질 수 있습니다.<br>
-      정확한 견적은 에어브리지 고객센터(032-502-1880 / <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d6e7e4d6c647f627e236e6223667f">[email&#160;protected]</a>)로 문의해 주세요.
+      정확한 견적은 에어브리지 고객센터(032-502-1880 / <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0a69794a6b63786579246965246178">[email&#160;protected]</a>)로 문의해 주세요.
     </div>
   </div>
 
@@ -1169,3 +1181,22 @@ function initCountries() {
     opt.value = c;
     opt.textContent = `${COUNTRY_KR[c]||c} (${c})`;
     sel.appendChild(opt);
+
+  }
+}
+
+function initFuel() {
+  document.getElementById('fuel-dhl-disp').textContent   = FUEL.dhl   + '%';
+  document.getElementById('fuel-fedex-disp').textContent = FUEL.fedex + '%';
+  document.getElementById('fuel-ups-disp').textContent   = FUEL.ups   + '%';
+}
+
+// 초기 1행
+addCT();
+initCountries();
+initFuel();
+</script>
+</div><!-- /page-wrap -->
+<script src="common.js"></script>
+</body>
+</html>
