@@ -47,7 +47,7 @@
           <div style="font-size:11px;color:var(--muted);font-family:var(--mono);">AIRBRIDGE Co., Ltd.</div>
         </div>
       </div>
-      <p>DHL 총대리점 (인천·부천·안산)<br>
+      <p>DHL·FedEx·UPS 공식 대리점<br>
       항공특급·항공화물·해상화물 전문<br>
       신속하고 안전한 국제특송 서비스</p>
     </div>
@@ -73,7 +73,7 @@
   </div>
   <div class="footer-bottom">
     <span>© 2026 에어브리지 국제특송 (AIRBRIDGE Co., Ltd.) All rights reserved.</span>
-    <span>DHL 총대리점 · airbridge.kr</span>
+    <span>DHL·FedEx·UPS 공식 대리점 · airbridge.kr</span>
   </div>
 </footer>`;
 
