@@ -72,31 +72,36 @@
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(34,211,238,0.12);
-  border: 1px solid rgba(34,211,238,0.30);
-  border-radius: 20px;
-  padding: 5px 16px 5px 11px;
-  font-size: 12px;
+  gap: 10px;
+  background: rgba(34,211,238,0.15);
+  border: 1.5px solid rgba(34,211,238,0.50);
+  border-radius: 40px;
+  padding: 10px 24px 10px 16px;
+  font-size: 17px;
+  font-weight: 700;
   color: var(--cyan);
-  font-family: var(--mono);
-  margin-bottom: 28px;
+  font-family: var(--sans);
+  margin-bottom: 24px;
+  letter-spacing: -0.3px;
+  box-shadow: 0 0 24px rgba(34,211,238,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
   white-space: nowrap;
 }
 .hero-badge-dot {
-  width: 6px; height: 6px;
+  width: 9px; height: 9px;
   background: var(--cyan);
   border-radius: 50%;
   animation: pulse-cyan 2s ease-in-out infinite;
   flex-shrink: 0;
+  box-shadow: 0 0 8px var(--cyan);
 }
 
 .hero-title {
-  font-size: clamp(40px, 6.5vw, 76px);
+  font-size: clamp(30px, 4.5vw, 52px);
   font-weight: 900;
-  letter-spacing: -2px;
-  line-height: 1.05;
-  margin-bottom: 22px;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: rgba(226,232,240,0.90);
 }
 .hero-title em {
   font-style: normal;
@@ -105,55 +110,138 @@
 }
 
 .hero-sub {
-  font-size: 16px;
-  color: rgba(226,232,240,0.82);
-  line-height: 1.85;
-  margin-bottom: 36px;
-  max-width: 560px;
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.9;
+  margin-bottom: 40px;
+  max-width: 640px;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.5);
 }
 
 .hero-btns {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
   margin-bottom: 52px;
 }
+/* 운임 계산하기 — 메인 강조 버튼 */
+.btn-hero-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 40px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 900;
+  font-family: var(--sans);
+  letter-spacing: -0.3px;
+  color: #0d1117;
+  background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0891b2 100%);
+  box-shadow:
+    0 0 0 0 rgba(34,211,238,0.5),
+    0 8px 32px rgba(34,211,238,0.35),
+    0 2px 8px rgba(0,0,0,0.3);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s;
+  animation: heroBtn-pulse 2.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+.btn-hero-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+  border-radius: inherit;
+}
+.btn-hero-main:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 0 0 6px rgba(34,211,238,0.2),
+    0 12px 40px rgba(34,211,238,0.45),
+    0 4px 12px rgba(0,0,0,0.3);
+  animation: none;
+}
+.btn-hero-main:active { transform: scale(0.98); }
 
-/* Stats — 가운데 */
-.hero-stats {
+@keyframes heroBtn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,0.5), 0 8px 32px rgba(34,211,238,0.35), 0 2px 8px rgba(0,0,0,0.3); }
+  50%       { box-shadow: 0 0 0 10px rgba(34,211,238,0), 0 8px 32px rgba(34,211,238,0.35), 0 2px 8px rgba(0,0,0,0.3); }
+}
+/* 상담 문의 — 보조 버튼 */
+.btn-hero-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 32px;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--sans);
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  text-decoration: none;
+  transition: all 0.25s;
+  backdrop-filter: blur(4px);
+}
+.btn-hero-sub:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.45);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* 유류할증료 표시 바 */
+.hero-fuel {
   display: flex;
-  gap: 14px;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-}
-.hero-stat {
-  background: rgba(22,27,39,0.82);
+  background: rgba(13,17,23,0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(42,51,71,0.85);
-  border-radius: 14px;
-  padding: 16px 24px;
-  text-align: center;
-  min-width: 130px;
-  transition: border-color 0.3s, transform 0.2s;
+  border: 1px solid rgba(42,51,71,0.9);
+  border-radius: 40px;
+  padding: 10px 20px;
 }
-.hero-stat:hover {
-  border-color: var(--cyan-dim);
-  transform: translateY(-3px);
-}
-.hero-stat-num {
-  font-size: 24px;
-  font-weight: 900;
-  font-family: var(--mono);
-  color: var(--cyan);
-  letter-spacing: -1px;
-  line-height: 1.2;
-}
-.hero-stat-label {
+.hf-label {
   font-size: 11px;
   color: var(--muted);
-  margin-top: 5px;
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+  padding-right: 10px;
+  border-right: 1px solid var(--border2);
+}
+.hf-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-right: 1px solid var(--border2);
+}
+.hf-item:last-of-type { border-right: none; }
+.hf-carrier {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.hf-pct {
+  font-size: 15px;
+  font-weight: 900;
+  font-family: var(--mono);
+  color: var(--amber);
+}
+.hf-update {
+  font-size: 10px;
+  color: var(--muted2);
+  font-family: var(--mono);
+  padding-left: 8px;
 }
 
 /* 슬라이드 인디케이터 */
@@ -361,8 +449,9 @@
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .hero { padding: 60px 0 48px; }
-  .hero-stats { gap: 10px; }
-  .hero-stat { min-width: 110px; padding: 14px 16px; }
+  .hero-fuel { gap: 6px; padding: 8px 14px; }
+  .hf-item { padding: 0 6px; }
+  .hf-pct { font-size: 13px; }
   .services-grid { grid-template-columns: 1fr 1fr; }
   .why-grid { grid-template-columns: 1fr; }
   .cta-banner { flex-direction: column; text-align: center; padding: 40px 24px; }
@@ -373,8 +462,8 @@
 @media (max-width: 600px) {
   .services-grid { grid-template-columns: 1fr; }
   .hero-badge { font-size: 10px; padding: 4px 12px 4px 9px; }
-  .hero-stat { min-width: 85px; padding: 12px 12px; }
-  .hero-stat-num { font-size: 18px; }
+  .hero-fuel { flex-wrap: wrap; gap: 4px; }
+  .hf-label { display: none; }
 }
 </style>
 </head>
@@ -414,28 +503,30 @@
         </p>
 
         <div class="hero-btns anim-fadeup anim-d3">
-          <a href="/calculator.html" class="btn btn-primary btn-lg">✈ 운임 계산하기</a>
-          <a href="/contact.html"    class="btn btn-outline btn-lg">📞 상담 문의</a>
+          <a href="/calculator.html" class="btn-hero-main">
+            ✈&nbsp; 운임 계산하기
+          </a>
+          <a href="/contact.html" class="btn-hero-sub">
+            📞 상담 문의
+          </a>
         </div>
 
-        <!-- Stats — 중앙 정렬 -->
-        <div class="hero-stats anim-fadeup anim-d4">
-          <div class="hero-stat">
-            <div class="hero-stat-num">230<span style="font-size:14px;">+</span></div>
-            <div class="hero-stat-label">배송 가능 국가</div>
+        <!-- 현재 유류할증료 -->
+        <div class="hero-fuel anim-fadeup anim-d4">
+          <span class="hf-label">🔥 현재 유류할증료</span>
+          <div class="hf-item">
+            <span class="hf-carrier" style="color:#ef4444;">DHL</span>
+            <span class="hf-pct" id="idx-fuel-dhl">39%</span>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" style="font-size:15px; letter-spacing:0; line-height:1.4;">DHL·FedEx·UPS</div>
-            <div class="hero-stat-label">공식 대리점</div>
+          <div class="hf-item">
+            <span class="hf-carrier" style="color:#a855f7;">FedEx</span>
+            <span class="hf-pct" id="idx-fuel-fedex">46%</span>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num">1<span style="font-size:14px;">일~</span></div>
-            <div class="hero-stat-label">최단 배송일</div>
+          <div class="hf-item">
+            <span class="hf-carrier" style="color:#f97316;">UPS</span>
+            <span class="hf-pct" id="idx-fuel-ups">46%</span>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" style="font-size:20px;">EMS</div>
-            <div class="hero-stat-label">국제우편 서비스</div>
-          </div>
+          <span class="hf-update">🔄 매주 업데이트 · <span id="idx-fuel-date">-</span></span>
         </div>
 
       </div>
@@ -663,6 +754,24 @@
   }
 
   resetTimer();
+})();
+
+/* ── 유류할증료 로드 (fuel.json) ── */
+(async function() {
+  try {
+    const r = await fetch('fuel.json?t=' + Date.now());
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    document.getElementById('idx-fuel-dhl').textContent   = d.dhl   + '%';
+    document.getElementById('idx-fuel-fedex').textContent = d.fedex + '%';
+    document.getElementById('idx-fuel-ups').textContent   = d.ups   + '%';
+    document.getElementById('idx-fuel-date').textContent  = d.date  || '';
+  } catch(e) {
+    document.getElementById('idx-fuel-dhl').textContent   = '39%';
+    document.getElementById('idx-fuel-fedex').textContent = '46%';
+    document.getElementById('idx-fuel-ups').textContent   = '46%';
+    document.getElementById('idx-fuel-date').textContent  = '수동설정';
+  }
 })();
 </script>
 </body>
