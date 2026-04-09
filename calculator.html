@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>에어브리지 국제특송 — 운임 계산기</title>
+<link rel="stylesheet" href="style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -582,23 +583,8 @@ select.form-control option { background: var(--surface); }
 </style>
 </head>
 <body>
+<div class="page-wrap">
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-mark">AB</div>
-      <div>
-        <div class="logo-text">에어브리지 국제특송</div>
-        <div class="logo-sub">AIRBRIDGE Co., Ltd.</div>
-      </div>
-    </div>
-    <div class="header-info">
-      <div>032-502-1880 &nbsp;|&nbsp; <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="22415162434b504d510c414d0c4950">[email&#160;protected]</a></span></div>
-      <div>DHL 총대리점 (인천·부천·안산)</div>
-    </div>
-  </div>
-</header>
 
 <div class="container">
 
@@ -609,7 +595,7 @@ select.form-control option { background: var(--surface); }
       <div class="fuel-chip"><span class="fc-label">DHL</span><span class="fc-val" id="fuel-dhl-disp">39.0%</span></div>
       <div class="fuel-chip"><span class="fc-label">FedEx</span><span class="fc-val" id="fuel-fedex-disp">46.25%</span></div>
       <div class="fuel-chip"><span class="fc-label">UPS</span><span class="fc-val" id="fuel-ups-disp">46.25%</span></div>
-      <div class="note-badge">📅 <span id="fuel-date">2026-03-31</span> 기준</div>
+      <div class="note-badge">🔄 매주 업데이트 | <span id="fuel-date">2026-04-08</span> 기준</div>
     </div>
   </div>
 
@@ -618,10 +604,9 @@ select.form-control option { background: var(--surface); }
     <div class="card-title">기본 정보</div>
     <div class="form-grid">
       <div class="form-group" style="grid-column: span 2;">
-        <label class="form-label">목적지 국가</label>
-        <select class="form-control" id="dest-country">
-          <option value="">국가를 선택하세요</option>
-        </select>
+        <label class="form-label">목적지 국가 <span style="font-size:11px;color:var(--muted);font-weight:400;">(한글 또는 영문 입력 / 선택)</span></label>
+        <input type="text" class="form-control" id="dest-country" list="country-list" placeholder="예: 일본, Japan, 미국..." autocomplete="off">
+        <datalist id="country-list"></datalist>
       </div>
       <div class="form-group">
         <label class="form-label">수출 / 수입</label>
@@ -742,6 +727,13 @@ let ctRows = [];
 let ctId   = 0;
 
 const FUEL = { dhl: 39.0, fedex: 46.25, ups: 46.25 };
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📌 유류할증료 업데이트 방법:
+//    위 숫자만 변경 후 저장 → GitHub 업로드하면 자동 반영
+//    DHL: 매주 변동 / FedEx·UPS: 매주 변동
+//    업데이트 날짜도 아래 FUEL_DATE 변경
+const FUEL_DATE = '2026-04-08'; // ← 이 날짜도 업데이트
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // ══════════════════════════════════════════════════════════
 // DATA: DHL
@@ -919,8 +911,15 @@ function upsLookup(w, zi, isDoc, imp) {
 // MAIN CALCULATE
 // ══════════════════════════════════════════════════════════
 function calculate() {
-  const country = document.getElementById('dest-country').value;
-  if (!country) { alert('목적지 국가를 선택해주세요.'); return; }
+  // input+datalist: 입력값을 영문 국가명으로 변환
+  const rawInput = document.getElementById('dest-country').value.trim();
+  // 한글 입력 → 영문 변환
+  const country = KR_TO_EN[rawInput] || rawInput;
+  if (!country || !DHL_ZONE_MAP[country]) {
+    alert('올바른 국가명을 입력하거나 선택해주세요.\n예: 일본, Japan, 미국, United States of America');
+    document.getElementById('dest-country').focus();
+    return;
+  }
 
   const imp = (mode === '수입');
   const discDHL    = parseFloat(document.getElementById('disc-dhl').value)    || 0;
@@ -1189,6 +1188,7 @@ function initFuel() {
   document.getElementById('fuel-dhl-disp').textContent   = FUEL.dhl   + '%';
   document.getElementById('fuel-fedex-disp').textContent = FUEL.fedex + '%';
   document.getElementById('fuel-ups-disp').textContent   = FUEL.ups   + '%';
+  document.getElementById('fuel-date').textContent = FUEL_DATE;
 }
 
 // 초기 1행
