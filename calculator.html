@@ -580,6 +580,73 @@ select.form-control option { background: var(--surface); }
   padding: 2px 8px;
   font-family: var(--mono);
 }
+
+/* ── 커스텀 국가 검색 드롭다운 ── */
+.country-wrap { position: relative; }
+.country-input-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+.country-input-box:focus-within {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.08);
+}
+.country-input-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--sans);
+  outline: none;
+}
+.country-input-box input::placeholder { color: var(--muted2); }
+.country-clear-btn {
+  padding: 0 12px;
+  background: none;
+  border: none;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: none;
+}
+.country-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 200;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.country-dropdown.open { display: block; }
+.country-option {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.country-option:last-child { border-bottom: none; }
+.country-option:hover, .country-option.highlighted { background: var(--cyan-pale); color: var(--cyan); }
+.country-option .co-kr { font-weight: 600; }
+.country-option .co-en { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.country-option .co-zone { font-size: 11px; color: var(--muted2); font-family: var(--mono); }
+.country-empty { padding: 16px 14px; font-size: 13px; color: var(--muted); text-align: center; }
 </style>
 </head>
 <body>
@@ -604,9 +671,18 @@ select.form-control option { background: var(--surface); }
     <div class="card-title">기본 정보</div>
     <div class="form-grid">
       <div class="form-group" style="grid-column: span 2;">
-        <label class="form-label">목적지 국가 <span style="font-size:11px;color:var(--muted);font-weight:400;">(한글 또는 영문 입력 / 선택)</span></label>
-        <input type="text" class="form-control" id="dest-country" list="country-list" placeholder="예: 일본, Japan, 미국..." autocomplete="off">
-        <datalist id="country-list"></datalist>
+        <label class="form-label">목적지 국가 <span style="font-size:11px;color:var(--muted);font-weight:400;">(한글 또는 영문으로 검색)</span></label>
+        <div class="country-wrap">
+          <div class="country-input-box">
+            <input type="text" id="country-search" placeholder="예: 일본, Japan, 미국, USA..." autocomplete="off"
+              oninput="filterCountryDrop(this.value)"
+              onfocus="openCountryDrop()"
+              onkeydown="countryKeyNav(event)">
+            <button class="country-clear-btn" id="country-clear" onclick="clearCountry()" tabindex="-1">×</button>
+          </div>
+          <div class="country-dropdown" id="country-dropdown"></div>
+          <input type="hidden" id="dest-country">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">수출 / 수입</label>
@@ -726,14 +802,9 @@ let isDoc  = false;
 let ctRows = [];
 let ctId   = 0;
 
-const FUEL = { dhl: 39.0, fedex: 46.25, ups: 46.25 };
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📌 유류할증료 업데이트 방법:
-//    위 숫자만 변경 후 저장 → GitHub 업로드하면 자동 반영
-//    DHL: 매주 변동 / FedEx·UPS: 매주 변동
-//    업데이트 날짜도 아래 FUEL_DATE 변경
-const FUEL_DATE = '2026-04-08'; // ← 이 날짜도 업데이트
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 유류할증료: fuel.json에서 자동 로드 (기본값)
+let FUEL = { dhl: 39.0, fedex: 46.0, ups: 46.0 };
+let FUEL_DATE = '로딩중...';
 
 // ══════════════════════════════════════════════════════════
 // DATA: DHL
@@ -911,13 +982,10 @@ function upsLookup(w, zi, isDoc, imp) {
 // MAIN CALCULATE
 // ══════════════════════════════════════════════════════════
 function calculate() {
-  // input+datalist: 입력값을 영문 국가명으로 변환
-  const rawInput = document.getElementById('dest-country').value.trim();
-  // 한글 입력 → 영문 변환
-  const country = KR_TO_EN[rawInput] || rawInput;
+  const country = document.getElementById('dest-country').value.trim();
   if (!country || !DHL_ZONE_MAP[country]) {
-    alert('올바른 국가명을 입력하거나 선택해주세요.\n예: 일본, Japan, 미국, United States of America');
-    document.getElementById('dest-country').focus();
+    alert('목적지 국가를 선택해주세요.\n검색창에 국가명을 입력하면 목록이 나타납니다.');
+    document.getElementById('country-search').focus();
     return;
   }
 
@@ -1172,23 +1240,131 @@ function setDocType(doc) {
 // ══════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════
-function initCountries() {
-  const sel = document.getElementById('dest-country');
-  const countries = Object.keys(DHL_ZONE_MAP).sort();
-  for (const c of countries) {
-    const opt = document.createElement('option');
-    opt.value = c;
-    opt.textContent = `${COUNTRY_KR[c]||c} (${c})`;
-    sel.appendChild(opt);
+// ── 커스텀 국가 검색 드롭다운 ──
+const KR_TO_EN = {};
+Object.entries(COUNTRY_KR).forEach(([en, kr]) => { KR_TO_EN[kr] = en; });
 
+// 가나다 정렬된 국가 배열
+const COUNTRY_LIST = Object.keys(DHL_ZONE_MAP).sort((a, b) => {
+  return (COUNTRY_KR[a]||a).localeCompare(COUNTRY_KR[b]||b, 'ko');
+});
+
+let selectedCountryEN = '';
+let highlightIdx = -1;
+let currentOptions = [];
+
+function buildDropdownItems(list) {
+  const dd = document.getElementById('country-dropdown');
+  dd.innerHTML = '';
+  currentOptions = list;
+  highlightIdx = -1;
+  if (list.length === 0) {
+    dd.innerHTML = '<div class="country-empty">검색 결과가 없습니다</div>';
+    return;
+  }
+  list.forEach((en, i) => {
+    const kr = COUNTRY_KR[en] || en;
+    const zone = DHL_ZONE_MAP[en];
+    const div = document.createElement('div');
+    div.className = 'country-option';
+    div.innerHTML = `<span class="co-kr">${kr}</span><span class="co-en">${en}</span><span class="co-zone">Zone ${zone}</span>`;
+    div.addEventListener('mousedown', (e) => { e.preventDefault(); selectCountry(en); });
+    dd.appendChild(div);
+  });
+}
+
+function openCountryDrop() {
+  const q = document.getElementById('country-search').value.trim();
+  filterCountryDrop(q || '');
+  document.getElementById('country-dropdown').classList.add('open');
+}
+
+function filterCountryDrop(q) {
+  const dd = document.getElementById('country-dropdown');
+  dd.classList.add('open');
+  if (!q) { buildDropdownItems(COUNTRY_LIST); return; }
+  const ql = q.toLowerCase();
+  const filtered = COUNTRY_LIST.filter(en => {
+    const kr = COUNTRY_KR[en] || '';
+    return kr.includes(q) || en.toLowerCase().includes(ql);
+  });
+  buildDropdownItems(filtered);
+}
+
+function selectCountry(en) {
+  selectedCountryEN = en;
+  document.getElementById('dest-country').value = en;
+  const kr = COUNTRY_KR[en] || en;
+  document.getElementById('country-search').value = kr + ' (' + en + ')';
+  document.getElementById('country-dropdown').classList.remove('open');
+  document.getElementById('country-clear').style.display = 'flex';
+}
+
+function clearCountry() {
+  selectedCountryEN = '';
+  document.getElementById('dest-country').value = '';
+  document.getElementById('country-search').value = '';
+  document.getElementById('country-clear').style.display = 'none';
+  document.getElementById('country-dropdown').classList.remove('open');
+  document.getElementById('country-search').focus();
+}
+
+function countryKeyNav(e) {
+  const dd = document.getElementById('country-dropdown');
+  const items = dd.querySelectorAll('.country-option');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightIdx));
+    if (items[highlightIdx]) items[highlightIdx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    highlightIdx = Math.max(highlightIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightIdx));
+    if (items[highlightIdx]) items[highlightIdx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (highlightIdx >= 0 && currentOptions[highlightIdx]) {
+      selectCountry(currentOptions[highlightIdx]);
+    }
+  } else if (e.key === 'Escape') {
+    dd.classList.remove('open');
   }
 }
 
-function initFuel() {
+// 외부 클릭 시 드롭다운 닫기
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.country-wrap')) {
+    document.getElementById('country-dropdown').classList.remove('open');
+  }
+});
+
+function initCountries() {
+  buildDropdownItems(COUNTRY_LIST);
+}
+
+function applyFuel(data) {
+  FUEL.dhl   = data.dhl;
+  FUEL.fedex = data.fedex;
+  FUEL.ups   = data.ups;
+  FUEL_DATE  = data.date || FUEL_DATE;
   document.getElementById('fuel-dhl-disp').textContent   = FUEL.dhl   + '%';
   document.getElementById('fuel-fedex-disp').textContent = FUEL.fedex + '%';
   document.getElementById('fuel-ups-disp').textContent   = FUEL.ups   + '%';
   document.getElementById('fuel-date').textContent = FUEL_DATE;
+}
+
+async function initFuel() {
+  try {
+    const res = await fetch('fuel.json?t=' + Date.now());
+    if (!res.ok) throw new Error('no fuel.json');
+    const data = await res.json();
+    applyFuel(data);
+  } catch(e) {
+    // 기본값 표시
+    applyFuel(FUEL);
+    document.getElementById('fuel-date').textContent = '수동 설정';
+  }
 }
 
 // 초기 1행
