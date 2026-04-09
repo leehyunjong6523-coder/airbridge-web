@@ -308,6 +308,10 @@ textarea.form-input { resize:vertical; min-height:120px; }
                 <label class="form-label">문의 내용 *</label>
                 <textarea class="form-input" id="cf-msg" name="message" placeholder="목적지 국가, 중량, 화물 종류 등을 함께 입력해 주시면 더 정확한 답변을 드릴 수 있습니다." required></textarea>
               </div>
+              <div class="form-group" style="margin-bottom:16px;">
+                <label class="form-label">게시판 비밀번호 <span style="font-size:11px;color:var(--muted);font-weight:400;">(내 문의 확인용 4~8자리)</span></label>
+                <input type="password" class="form-input" id="cf-pw" name="board_pw" placeholder="비밀번호 설정 (예: 1234)" maxlength="8" required>
+              </div>
               <button type="submit" class="form-submit" id="submit-btn">문의 보내기 →</button>
               <div class="form-note">입력하신 정보는 문의 답변 목적으로만 사용됩니다.</div>
             </form>
@@ -318,7 +322,8 @@ textarea.form-input { resize:vertical; min-height:120px; }
             <h3>문의가 접수되었습니다!</h3>
             <p>빠른 시일 내에 담당자가 연락드리겠습니다.<br>급한 문의는 <strong>032-502-1880</strong>으로 전화해 주세요.</p>
             <br>
-            <a href="/calculator.html" class="btn btn-primary" style="display:inline-flex;margin-top:8px;">✈ 운임 계산기 바로가기</a>
+            <a href="/calculator.html" class="btn btn-primary" style="display:inline-flex;margin-top:8px;">✈ 운임 계산기</a>
+            <a href="/inquiries.html" class="btn btn-outline" style="display:inline-flex;margin-top:8px;">📋 내 문의 확인</a>
           </div>
         </div>
 
@@ -404,6 +409,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
   </section>
 
 </div>
+<script src="supabase-config.js"></script>
 <script src="common.js"></script>
 <!-- EmailJS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -423,9 +429,9 @@ textarea.form-input { resize:vertical; min-height:120px; }
  * 5. 아래 3개 값 교체:
  * ═══════════════════════════════════════════════════
  */
-const EJS_PUBLIC_KEY  = '346Jed4TuXrwhXGrj';   // ← EmailJS Public Key
-const EJS_SERVICE_ID  = 'service_vprhew7';   // ← Service ID
-const EJS_TEMPLATE_ID = 'template_pt35czj';  // ← Template ID
+const EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← EmailJS Public Key
+const EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← Service ID
+const EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← Template ID
 
 // EmailJS가 설정되어 있는지 확인
 const EJS_READY = EJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
@@ -444,7 +450,23 @@ async function submitForm(e) {
     inquiry_type: document.getElementById('cf-type').value || '미선택',
     message:      document.getElementById('cf-msg').value,
     to_email:     'cs@airos.co.kr',
+    reply_to:     document.getElementById('cf-email').value || '(이메일 미입력)',
   };
+
+  // ── Supabase 문의 게시판 저장 ──
+  if (typeof DB !== 'undefined' && DB.ready()) {
+    try {
+      await DB.post('inquiries', {
+        name:     params.from_name,
+        tel:      params.from_tel,
+        email:    params.from_email,
+        type:     params.inquiry_type,
+        message:  params.message,
+        password: document.getElementById('cf-pw').value || '0000',
+        answered: false
+      });
+    } catch(e) { console.warn('게시판 저장 실패:', e); }
+  }
 
   if (EJS_READY) {
     // ── EmailJS 발송 ──
@@ -458,6 +480,7 @@ async function submitForm(e) {
     }
   } else {
     // ── EmailJS 미설정: mailto 폴백 ──
+    // (Supabase 저장은 위에서 이미 처리됨)
     const subject = encodeURIComponent('[에어브리지 문의] ' + params.inquiry_type + ' - ' + params.from_name);
     const body = encodeURIComponent(
       '보내는 사람: ' + params.from_name + '\n' +

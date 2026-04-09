@@ -473,9 +473,42 @@
   .hf-item { padding: 0 10px; }
   .hf-pct { font-size: 20px; }
 }
+
+/* ── 공지 팝업 ── */
+.popup-bg{display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.popup-bg.open{display:flex}
+.popup-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px;width:100%;max-width:480px;margin:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative}
+.popup-tag{font-size:11px;font-family:var(--mono);color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.popup-title{font-size:20px;font-weight:900;letter-spacing:-.4px;margin-bottom:12px}
+.popup-body{font-size:14px;color:var(--text2);line-height:1.8;white-space:pre-line;max-height:160px;overflow-y:auto;margin-bottom:20px}
+.popup-date{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:20px}
+.popup-actions{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.popup-close{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:var(--sans)}
+.popup-close:hover{border-color:var(--border2);color:var(--text)}
+.popup-more{padding:10px 20px;border-radius:8px;border:none;background:var(--cyan-dim);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex}
+.popup-today{font-size:12px;color:var(--muted2);cursor:pointer;background:none;border:none;font-family:var(--sans)}
+.popup-today:hover{color:var(--text)}
 </style>
 </head>
 <body>
+
+<!-- 공지 팝업 (7일 이내 공지) -->
+<div class="popup-bg" id="notice-popup">
+  <div class="popup-box">
+    <div class="popup-tag">📢 공지사항</div>
+    <div class="popup-title" id="popup-title"></div>
+    <div class="popup-date" id="popup-date"></div>
+    <div class="popup-body" id="popup-body"></div>
+    <div class="popup-actions">
+      <button class="popup-today" onclick="closePopupToday()">오늘 하루 보지 않기</button>
+      <div style="display:flex;gap:8px;">
+        <button class="popup-close" onclick="closePopup()">닫기</button>
+        <a class="popup-more" href="/notices.html">공지 전체보기</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="page-wrap">
 
   <!-- ══ HERO ══ -->
@@ -623,7 +656,7 @@
         <div class="svc-card s3 anim-fadeup anim-d3">
           <span class="svc-icon">📦</span>
           <div class="svc-title">UPS Worldwide Saver</div>
-          <div class="svc-desc">UPS 공식 대리점. 2개 계정 운영으로 최적 운임 비교 제공. 중량화물 Freight 전환 가능.</div>
+          <div class="svc-desc">UPS 공식 대리점으로 최적 운임을 제공합니다. 중량화물 Freight 전환도 가능합니다.</div>
           <div><span class="svc-badge-official">⭐ 공식 대리점</span></div>
           <span class="svc-tag">Worldwide Saver</span>
         </div>
@@ -673,7 +706,7 @@
             <div class="why-num">02</div>
             <div>
               <div class="why-item-title">다중 운송사 + EMS 비교 견적</div>
-              <div class="why-item-desc">DHL·FedEx IP/Economy·UPS(2계정)·EMS 총 6가지 옵션을 동시에 비교하여 가장 경제적인 운송 방법을 선택할 수 있습니다.</div>
+              <div class="why-item-desc">DHL·FedEx IP/Economy·UPS·EMS를 동시에 비교하여 가장 경제적인 운송 방법을 선택할 수 있습니다.</div>
             </div>
           </div>
           <div class="why-item anim-fadeup anim-d3">
@@ -736,6 +769,7 @@
 
 </div><!-- /page-wrap -->
 
+<script src="supabase-config.js"></script>
 <script src="common.js"></script>
 <script>
 /* ── 히어로 슬라이드쇼 ── */
@@ -765,6 +799,53 @@
 
   resetTimer();
 })();
+
+
+/* ── 공지 팝업 ── */
+(async function(){
+  // 오늘 하루 닫기 확인
+  const hideUntil=localStorage.getItem('ab_popup_hide');
+  if(hideUntil && new Date()<new Date(hideUntil)) return;
+  // 세션 내 이미 봤으면 스킵
+  if(sessionStorage.getItem('ab_popup_seen')) return;
+
+  let recentNotice=null;
+  const sevenDaysAgo=new Date(Date.now()-7*24*60*60*1000).toISOString();
+
+  try{
+    if(typeof DB!=='undefined'&&DB.ready()){
+      const r=await DB.get('notices',`created_at=gte.${sevenDaysAgo}&order=pinned.desc,created_at.desc&limit=1`);
+      if(r&&r[0]) recentNotice=r[0];
+    } else {
+      // fallback notices.json
+      const r=await fetch('notices.json?t='+Date.now());
+      if(r.ok){
+        const ns=await r.json();
+        const recent=ns.filter(n=>{
+          const d=new Date(n.created_at||n.date||'2000-01-01');
+          return Date.now()-d.getTime()<7*24*60*60*1000;
+        });
+        if(recent.length) recentNotice=recent[0];
+      }
+    }
+  } catch(e){}
+
+  if(!recentNotice) return;
+
+  document.getElementById('popup-title').textContent=recentNotice.title;
+  document.getElementById('popup-date').textContent='📅 '+new Date(recentNotice.created_at||recentNotice.date).toLocaleDateString('ko-KR');
+  const body=recentNotice.content||'';
+  document.getElementById('popup-body').textContent=body.length>200?body.slice(0,200)+'...':body;
+  document.getElementById('notice-popup').classList.add('open');
+  sessionStorage.setItem('ab_popup_seen','1');
+})();
+
+function closePopup(){ document.getElementById('notice-popup').classList.remove('open'); }
+function closePopupToday(){
+  const tomorrow=new Date(); tomorrow.setHours(23,59,59,0);
+  localStorage.setItem('ab_popup_hide',tomorrow.toISOString());
+  closePopup();
+}
 
 /* ── 유류할증료 로드 (fuel.json) ── */
 (async function() {

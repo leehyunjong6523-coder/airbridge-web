@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문의 게시판 — (주) 에어브리지</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-hero{padding:56px 0 40px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%)}
+.page-hero-tag{font-size:11px;font-family:var(--mono);color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.page-hero h1{font-size:clamp(24px,3.5vw,40px);font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
+.page-hero p{font-size:14px;color:var(--muted)}
+/* 목록 */
+.inq-list{display:flex;flex-direction:column}
+.inq-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s;color:var(--text)}
+.inq-item:first-child{border-top:1px solid var(--border)}
+.inq-item:hover{background:var(--surface)}
+.inq-status-done{flex-shrink:0;font-size:11px;color:var(--green);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:4px;padding:2px 8px;font-family:var(--mono)}
+.inq-status-wait{flex-shrink:0;font-size:11px;color:var(--muted2);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-family:var(--mono)}
+.inq-title-col{flex:1;min-width:0}
+.inq-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.inq-title span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inq-lock{font-size:13px}
+.inq-meta{display:flex;gap:12px;margin-top:4px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+/* 상세 */
+.detail-view{display:none}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:24px;background:none;border:none;font-family:var(--sans);padding:0;transition:color .2s}
+.back-btn:hover{color:var(--cyan)}
+.inq-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px}
+.inq-card-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.inq-card-title{font-size:20px;font-weight:900;letter-spacing:-.4px}
+.inq-card-meta{font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.8;margin-top:6px}
+.inq-card-body{font-size:15px;line-height:1.9;color:var(--text2);white-space:pre-line;margin-bottom:20px}
+.inq-reply-box{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:16px 20px;font-size:14px;line-height:1.8;white-space:pre-line}
+.inq-reply-label{font-size:11px;font-family:var(--mono);color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
+.admin-actions{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap}
+.btn-answered{font-size:13px;font-weight:700;color:#fff;background:var(--green);border:none;border-radius:6px;padding:8px 16px;cursor:pointer;transition:opacity .2s}
+.btn-answered:hover{opacity:.85}
+.btn-undo{font-size:13px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 14px;cursor:pointer}
+.btn-del-inq{font-size:13px;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:8px 14px;cursor:pointer}
+/* 관리자바 */
+.admin-bar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:16px}
+.btn-al{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted2);background:transparent;border:1px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;transition:all .2s}
+.btn-al:hover{color:var(--cyan);border-color:var(--cyan-dim)}
+.btn-lo{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--mono)}
+.btn-lo:hover{color:var(--red)}
+/* 모달 */
+.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:440px;margin:16px;max-height:90vh;overflow-y:auto}
+.mt{font-size:18px;font-weight:900;margin-bottom:24px}
+.mf{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.ml{font-size:12px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.mi{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-size:14px;font-family:var(--sans);outline:none;transition:border-color .2s;width:100%}
+.mi:focus{border-color:var(--cyan-dim)}
+.modal-btns{display:flex;gap:10px;margin-top:20px}
+.m-ca{flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;font-family:var(--sans)}
+.m-ok{flex:2;padding:11px;border-radius:8px;border:none;background:var(--cyan-dim);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+.m-ca:hover{border-color:var(--border2);color:var(--text)}
+.m-ok:hover{opacity:.85}
+.merr{font-size:12px;color:var(--red);margin-top:8px;display:none}
+/* 내 문의 찾기 */
+.find-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.find-box input{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;font-family:var(--sans);outline:none}
+.find-box input:focus{border-color:var(--cyan-dim)}
+.find-box label{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.btn-find{padding:9px 18px;border-radius:8px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;cursor:pointer;transition:all .2s;font-family:var(--sans)}
+.btn-find:hover{border-color:var(--cyan);color:var(--cyan)}
+.inq-no-badge{font-size:11px;font-family:var(--mono);color:var(--muted2);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;flex-shrink:0}
+.empty-box{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.loading-box{text-align:center;padding:40px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag">Inquiries</div>
+      <h1>문의 게시판</h1>
+      <p>고객님의 문의 내역을 확인할 수 있습니다. 문의번호와 비밀번호로 내 문의를 찾아보세요.</p>
+    </div>
+  </div>
+  <section class="section">
+    <div class="container">
+      <div class="admin-bar" id="admin-bar">
+        <button class="btn-al" onclick="openLogin()">🔐 관리자 로그인</button>
+      </div>
+
+      <div id="list-view">
+        <!-- 내 문의 찾기 -->
+        <div class="find-box">
+          <div>
+            <label style="display:block;margin-bottom:6px;">📋 내 문의 찾기</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <input id="find-no" type="number" placeholder="문의 번호" style="width:100px;">
+              <input id="find-pw" type="password" placeholder="비밀번호" style="width:120px;">
+              <button class="btn-find" onclick="findMyInquiry()">조회하기</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="loading-box" class="loading-box">불러오는 중...</div>
+        <div class="inq-list" id="inq-list"></div>
+        <div class="empty-box" id="empty-box" style="display:none;">등록된 문의가 없습니다.</div>
+      </div>
+
+      <div class="detail-view" id="detail-view">
+        <button class="back-btn" onclick="showList()">← 목록으로</button>
+        <div class="inq-card">
+          <div class="inq-card-hdr">
+            <div>
+              <div class="inq-card-title" id="d-title"></div>
+              <div class="inq-card-meta" id="d-meta"></div>
+            </div>
+            <div id="d-status-badge"></div>
+          </div>
+          <div class="inq-card-body" id="d-body"></div>
+          <div id="d-reply-area"></div>
+          <div class="admin-actions" id="d-admin" style="display:none;">
+            <button class="btn-answered" id="btn-toggle-ans" onclick="toggleAnswered()">✅ 답변완료 처리</button>
+            <button class="btn-del-inq" onclick="doDeleteInq()">🗑 삭제</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- 관리자 로그인 모달 -->
+<div class="modal-bg" id="m-login">
+  <div class="modal-box">
+    <div class="mt">🔐 관리자 로그인</div>
+    <div class="mf"><label class="ml">아이디</label><input class="mi" id="l-id" type="text" placeholder="admin"></div>
+    <div class="mf"><label class="ml">비밀번호</label><input class="mi" id="l-pw" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="merr" id="l-err">아이디 또는 비밀번호가 틀렸습니다.</div>
+    <div class="modal-btns">
+      <button class="m-ca" onclick="closeM('m-login')">취소</button>
+      <button class="m-ok" onclick="doLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 비밀번호 확인 모달 (일반 사용자) -->
+<div class="modal-bg" id="m-pw">
+  <div class="modal-box">
+    <div class="mt">🔒 비밀번호 확인</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">문의 작성 시 입력한 비밀번호를 입력해 주세요.</p>
+    <div class="mf"><label class="ml">비밀번호</label><input class="mi" id="pw-input" type="password" onkeydown="if(event.key==='Enter')checkPw()"></div>
+    <div class="merr" id="pw-err">비밀번호가 올바르지 않습니다.</div>
+    <div class="modal-btns">
+      <button class="m-ca" onclick="closeM('m-pw')">취소</button>
+      <button class="m-ok" onclick="checkPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="common.js"></script>
+<script>
+const ADMIN_ID='admin', ADMIN_PW='a12345';
+let isAdmin=false, inquiries=[], currentId=null, pendingId=null;
+
+async function init(){
+  if(sessionStorage.getItem('ab_admin')==='1'){ isAdmin=true; showAdminUI(); }
+  await loadInquiries();
+}
+
+async function loadInquiries(){
+  if(!DB.ready()){ document.getElementById('loading-box').textContent='Supabase 미연결 상태입니다.'; return; }
+  try{
+    inquiries=await DB.get('inquiries','order=created_at.desc&select=id,name,type,answered,created_at');
+    renderList();
+  } catch(e){ document.getElementById('loading-box').textContent='불러오기 실패: '+e.message; }
+}
+
+function renderList(){
+  document.getElementById('loading-box').style.display='none';
+  const el=document.getElementById('inq-list');
+  if(!inquiries.length){ document.getElementById('empty-box').style.display='block'; return; }
+  document.getElementById('empty-box').style.display='none';
+  el.innerHTML=inquiries.map(n=>`
+    <div class="inq-item" onclick="clickItem(${n.id},${n.answered})">
+      <span class="inq-no-badge">#${n.id}</span>
+      ${n.answered
+        ? '<span class="inq-status-done">✅ 답변완료</span>'
+        : '<span class="inq-status-wait">⏳ 답변대기</span>'}
+      <div class="inq-title-col">
+        <div class="inq-title">
+          <span>${esc(n.type||'문의')}</span>
+          ${isAdmin?'':'<span class="inq-lock">🔒</span>'}
+        </div>
+        <div class="inq-meta">
+          <span>${esc(n.name)}</span>
+          <span>📅 ${fmtDate(n.created_at)}</span>
+        </div>
+      </div>
+      <span style="color:var(--muted2);font-size:18px;">›</span>
+    </div>`).join('');
+}
+
+function clickItem(id, answered){
+  pendingId=id;
+  if(isAdmin){ showDetail(id); return; }
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-err').style.display='none';
+  openM('m-pw');
+  setTimeout(()=>document.getElementById('pw-input').focus(),100);
+}
+
+async function checkPw(){
+  const pw=document.getElementById('pw-input').value;
+  if(!pw) return;
+  // DB에서 해당 문의의 password 조회 후 비교
+  try{
+    const r=await DB.get('inquiries',`id=eq.${pendingId}&select=id,password`);
+    if(r[0] && r[0].password===pw){
+      closeM('m-pw'); showDetail(pendingId);
+    } else {
+      document.getElementById('pw-err').style.display='block';
+    }
+  } catch(e){ alert('오류: '+e.message); }
+}
+
+async function findMyInquiry(){
+  const no=parseInt(document.getElementById('find-no').value);
+  const pw=document.getElementById('find-pw').value;
+  if(!no||!pw){ alert('문의 번호와 비밀번호를 모두 입력해주세요.'); return; }
+  try{
+    const r=await DB.get('inquiries',`id=eq.${no}&select=id,password`);
+    if(!r[0]){ alert('해당 번호의 문의를 찾을 수 없습니다.'); return; }
+    if(r[0].password===pw){ showDetail(no); }
+    else { alert('비밀번호가 올바르지 않습니다.'); }
+  } catch(e){ alert('오류: '+e.message); }
+}
+
+async function showDetail(id){
+  currentId=id;
+  try{
+    const r=await DB.get('inquiries',`id=eq.${id}&select=*`);
+    const n=r[0]; if(!n) return;
+    document.getElementById('d-title').textContent=`[${n.type||'문의'}] ${n.name}`;
+    document.getElementById('d-meta').innerHTML=
+      `<span>📋 문의번호: #${n.id}</span><span>📅 ${fmtDate(n.created_at)}</span><span>📞 ${n.tel}</span>${n.email?`<span>✉️ ${n.email}</span>`:''}`;
+    document.getElementById('d-body').textContent=n.message;
+    document.getElementById('d-status-badge').innerHTML=
+      n.answered ? '<span class="inq-status-done" style="font-size:13px;">✅ 답변완료</span>'
+                 : '<span class="inq-status-wait" style="font-size:13px;">⏳ 답변대기</span>';
+    // 답변 영역
+    document.getElementById('d-reply-area').innerHTML = n.answer
+      ? `<div class="inq-reply-box" style="margin-top:20px;"><span class="inq-reply-label">💬 에어브리지 답변</span>${esc(n.answer)}</div>`
+      : '';
+    // 관리자 액션
+    if(isAdmin){
+      document.getElementById('d-admin').style.display='flex';
+      const btn=document.getElementById('btn-toggle-ans');
+      if(n.answered){
+        btn.textContent='↩ 답변대기로 변경'; btn.style.background='var(--muted2)';
+      } else {
+        btn.textContent='✅ 답변완료 처리'; btn.style.background='var(--green)';
+      }
+    }
+    document.getElementById('list-view').style.display='none';
+    document.getElementById('detail-view').style.display='block';
+  } catch(e){ alert('불러오기 실패: '+e.message); }
+}
+
+async function toggleAnswered(){
+  try{
+    const r=await DB.get('inquiries',`id=eq.${currentId}&select=answered`);
+    const cur=r[0]?.answered||false;
+    await DB.patch('inquiries',`id=eq.${currentId}`,{answered:!cur});
+    // 목록 업데이트
+    const idx=inquiries.findIndex(x=>x.id===currentId);
+    if(idx>=0) inquiries[idx].answered=!cur;
+    showDetail(currentId);
+  } catch(e){ alert('오류: '+e.message); }
+}
+
+async function doDeleteInq(){
+  if(!confirm('이 문의를 삭제하시겠습니까?')) return;
+  try{
+    await DB.del('inquiries',`id=eq.${currentId}`);
+    inquiries=inquiries.filter(x=>x.id!==currentId);
+    showList(); renderList();
+  } catch(e){ alert('삭제 실패: '+e.message); }
+}
+
+function showList(){
+  currentId=null;
+  document.getElementById('detail-view').style.display='none';
+  document.getElementById('list-view').style.display='block';
+}
+
+// 관리자
+function openLogin(){
+  document.getElementById('l-id').value=''; document.getElementById('l-pw').value='';
+  document.getElementById('l-err').style.display='none'; openM('m-login');
+  setTimeout(()=>document.getElementById('l-id').focus(),100);
+}
+function doLogin(){
+  if(document.getElementById('l-id').value.trim()===ADMIN_ID && document.getElementById('l-pw').value===ADMIN_PW){
+    isAdmin=true; sessionStorage.setItem('ab_admin','1'); closeM('m-login'); showAdminUI();
+    loadInquiries(); // 관리자는 전체 재로드
+  } else { document.getElementById('l-err').style.display='block'; }
+}
+function doLogout(){
+  isAdmin=false; sessionStorage.removeItem('ab_admin');
+  document.getElementById('admin-bar').innerHTML=`<button class="btn-al" onclick="openLogin()">🔐 관리자 로그인</button>`;
+  document.getElementById('d-admin').style.display='none';
+  loadInquiries();
+}
+function showAdminUI(){
+  document.getElementById('admin-bar').innerHTML=`
+    <span style="font-size:12px;color:var(--cyan);font-family:var(--mono);">✅ 관리자 — 전체 문의 열람 가능</span>
+    <button class="btn-lo" onclick="doLogout()">로그아웃</button>`;
+}
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{ ['m-login','m-pw'].forEach(id=>{ if(e.target===document.getElementById(id)) closeM(id); }); });
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}); }
+init();
+</script>
+</body>
+</html>

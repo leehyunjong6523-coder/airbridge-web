@@ -19,6 +19,7 @@
     <li><a href="/about.html">회사소개</a></li>
     <li><a href="/services.html">서비스</a></li>
     <li><a href="/notices.html">공지사항</a></li>
+    <li><a href="/inquiries.html">문의게시판</a></li>
     <li><a href="/calculator.html">운임계산기</a></li>
     <li><a href="/contact.html">문의/오시는길</a></li>
   </ul>
@@ -32,6 +33,7 @@
   <a href="/about.html">회사소개</a>
   <a href="/services.html">서비스</a>
   <a href="/notices.html">공지사항</a>
+  <a href="/inquiries.html">문의게시판</a>
   <a href="/calculator.html">운임계산기</a>
   <a href="/contact.html">문의/오시는길</a>
   <a href="tel:032-502-1880" class="nav-cta">📞 032-502-1880</a>
@@ -61,6 +63,7 @@
         <li><a href="/about.html">회사소개</a></li>
         <li><a href="/services.html">서비스 안내</a></li>
         <li><a href="/notices.html">공지사항</a></li>
+        <li><a href="/inquiries.html">문의게시판</a></li>
         <li><a href="/calculator.html">운임 계산기</a></li>
         <li><a href="/contact.html">문의/오시는길</a></li>
       </ul>
