@@ -10,7 +10,7 @@
   <a href="/" class="nav-logo">
     <div class="nav-logo-mark">AB</div>
     <div class="nav-logo-text">
-      <div class="nav-logo-ko">에어브리지 국제특송</div>
+      <div class="nav-logo-ko">(주) 에어브리지</div>
       <div class="nav-logo-en">AIRBRIDGE Co., Ltd.</div>
     </div>
   </a>
@@ -18,6 +18,7 @@
     <li><a href="/">홈</a></li>
     <li><a href="/about.html">회사소개</a></li>
     <li><a href="/services.html">서비스</a></li>
+    <li><a href="/notices.html">공지사항</a></li>
     <li><a href="/calculator.html">운임계산기</a></li>
     <li><a href="/contact.html">문의/오시는길</a></li>
   </ul>
@@ -30,6 +31,7 @@
   <a href="/">홈</a>
   <a href="/about.html">회사소개</a>
   <a href="/services.html">서비스</a>
+  <a href="/notices.html">공지사항</a>
   <a href="/calculator.html">운임계산기</a>
   <a href="/contact.html">문의/오시는길</a>
   <a href="tel:032-502-1880" class="nav-cta">📞 032-502-1880</a>
@@ -43,7 +45,7 @@
       <div class="fb-logo">
         <div class="fb-mark">AB</div>
         <div>
-          <div style="font-size:14px;font-weight:700;">에어브리지 국제특송</div>
+          <div style="font-size:14px;font-weight:700;">(주) 에어브리지</div>
           <div style="font-size:11px;color:var(--muted);font-family:var(--mono);">AIRBRIDGE Co., Ltd.</div>
         </div>
       </div>
@@ -58,6 +60,7 @@
         <li><a href="/">홈</a></li>
         <li><a href="/about.html">회사소개</a></li>
         <li><a href="/services.html">서비스 안내</a></li>
+        <li><a href="/notices.html">공지사항</a></li>
         <li><a href="/calculator.html">운임 계산기</a></li>
         <li><a href="/contact.html">문의/오시는길</a></li>
       </ul>

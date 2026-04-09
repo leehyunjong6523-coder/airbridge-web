@@ -278,20 +278,20 @@ textarea.form-input { resize:vertical; min-height:120px; }
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">회사명 / 성함 *</label>
-                  <input type="text" class="form-input" placeholder="에어브리지 주식회사" required>
+                  <input type="text" class="form-input" id="cf-name" name="from_name" placeholder="회사명 또는 성함" required>
                 </div>
                 <div class="form-group">
                   <label class="form-label">연락처 *</label>
-                  <input type="tel" class="form-input" placeholder="010-0000-0000" required>
+                  <input type="tel" class="form-input" id="cf-tel" name="from_tel" placeholder="010-0000-0000" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">이메일</label>
-                <input type="email" class="form-input" placeholder="example@company.com">
+                <input type="email" class="form-input" id="cf-email" name="from_email" placeholder="example@company.com">
               </div>
               <div class="form-group">
                 <label class="form-label">문의 유형</label>
-                <select class="form-input">
+                <select class="form-input" id="cf-type" name="inquiry_type">
                   <option value="">선택해주세요</option>
                   <option>운임 견적 문의</option>
                   <option>픽업 예약</option>
@@ -306,9 +306,9 @@ textarea.form-input { resize:vertical; min-height:120px; }
               </div>
               <div class="form-group">
                 <label class="form-label">문의 내용 *</label>
-                <textarea class="form-input" placeholder="목적지 국가, 중량, 화물 종류 등을 함께 입력해 주시면 더 정확한 답변을 드릴 수 있습니다." required></textarea>
+                <textarea class="form-input" id="cf-msg" name="message" placeholder="목적지 국가, 중량, 화물 종류 등을 함께 입력해 주시면 더 정확한 답변을 드릴 수 있습니다." required></textarea>
               </div>
-              <button type="submit" class="form-submit">문의 보내기 →</button>
+              <button type="submit" class="form-submit" id="submit-btn">문의 보내기 →</button>
               <div class="form-note">입력하신 정보는 문의 답변 목적으로만 사용됩니다.</div>
             </form>
           </div>
@@ -357,7 +357,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
         <!-- 지도 헤더 -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
           <div style="font-size:15px;font-weight:700;">📍 오시는 길</div>
-          <a href="https://map.naver.com/p/search/인천광역시 부평구 수변로 19번길 5 새한빌딩"
+          <a href="https://map.naver.com/p/search/인천광역시%20부평구%20수변로19번길%205%20새한빌딩"
              target="_blank" rel="noopener"
              style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#03c75a;color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:opacity 0.2s;"
              onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
@@ -368,7 +368,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
         <!-- OpenStreetMap 임베드 (부평구 수변로) -->
         <div class="map-area" style="position:relative;border-radius:16px;overflow:hidden;height:320px;border:1px solid var(--border);">
           <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=126.7153%2C37.4838%2C126.7303%2C37.4938&layer=mapnik&marker=37.4888%2C126.7228"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=126.7210%2C37.4882%2C126.7410%2C37.5042&layer=mapnik&marker=37.4965%2C126.7310"
             style="width:100%;height:100%;border:none;"
             allowfullscreen loading="lazy"
             title="에어브리지 국제특송 위치">
@@ -387,15 +387,15 @@ textarea.form-input { resize:vertical; min-height:120px; }
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px;">
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
             <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;">🚇 지하철</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.7;">1호선 부평역 도보 약 10분<br>7호선 부평구청역 도보 약 15분</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">1호선 부개역 1번 출구 도보 약 1분</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
             <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;">🚌 버스</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.7;">부평구청 정류장 하차<br>수변로 방면 도보 5분</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">부개역 정류장 하차<br>수변로 방향 도보 1분</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
             <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;">🚗 자가용</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.7;">인천지방법원·인천계양IC<br>수변로 방면 새한빌딩</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">경인고속도로 부평IC 방면<br>수변로19번길 5 새한빌딩 1층</div>
           </div>
         </div>
       </div>
@@ -405,9 +405,73 @@ textarea.form-input { resize:vertical; min-height:120px; }
 
 </div>
 <script src="common.js"></script>
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>
-function submitForm(e) {
+/*
+ * ═══════════════════════════════════════════════════
+ * 📧 EmailJS 설정 방법 (최초 1회 설정)
+ *
+ * 1. https://www.emailjs.com 에서 무료 계정 생성
+ * 2. Email Services → Gmail 또는 SMTP 추가 (cs@airos.co.kr)
+ * 3. Email Templates → 새 템플릿 생성, 내용:
+ *    제목: [에어브리지] {{inquiry_type}} - {{from_name}}
+ *    내용: 보내는사람: {{from_name}} / 연락처: {{from_tel}} / 이메일: {{from_email}}
+ *          문의유형: {{inquiry_type}}
+ *          내용: {{message}}
+ * 4. Account → Public Key 복사
+ * 5. 아래 3개 값 교체:
+ * ═══════════════════════════════════════════════════
+ */
+const EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← EmailJS Public Key
+const EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← Service ID
+const EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← Template ID
+
+// EmailJS가 설정되어 있는지 확인
+const EJS_READY = EJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
+if (EJS_READY) emailjs.init(EJS_PUBLIC_KEY);
+
+async function submitForm(e) {
   e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = '전송 중...';
+  btn.disabled = true;
+
+  const params = {
+    from_name:    document.getElementById('cf-name').value,
+    from_tel:     document.getElementById('cf-tel').value,
+    from_email:   document.getElementById('cf-email').value,
+    inquiry_type: document.getElementById('cf-type').value || '미선택',
+    message:      document.getElementById('cf-msg').value,
+    to_email:     'cs@airos.co.kr',
+  };
+
+  if (EJS_READY) {
+    // ── EmailJS 발송 ──
+    try {
+      await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, params);
+      showSuccess();
+    } catch(err) {
+      btn.textContent = '문의 보내기 →';
+      btn.disabled = false;
+      alert('전송 중 오류가 발생했습니다.\n032-502-1880으로 전화해 주세요.');
+    }
+  } else {
+    // ── EmailJS 미설정: mailto 폴백 ──
+    const subject = encodeURIComponent('[에어브리지 문의] ' + params.inquiry_type + ' - ' + params.from_name);
+    const body = encodeURIComponent(
+      '보내는 사람: ' + params.from_name + '\n' +
+      '연락처: ' + params.from_tel + '\n' +
+      '이메일: ' + params.from_email + '\n' +
+      '문의 유형: ' + params.inquiry_type + '\n\n' +
+      '내용:\n' + params.message
+    );
+    window.location.href = 'mailto:cs@airos.co.kr?subject=' + subject + '&body=' + body;
+    showSuccess();
+  }
+}
+
+function showSuccess() {
   document.getElementById('form-main').style.display = 'none';
   document.getElementById('form-success').style.display = 'block';
 }

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공지사항 — 에어브리지 국제특송</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-hero {
+  padding: 56px 0 40px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+}
+.page-hero-tag { font-size:11px; font-family:var(--mono); color:var(--cyan); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+.page-hero h1  { font-size: clamp(24px,3.5vw,40px); font-weight:900; letter-spacing:-0.5px; margin-bottom:8px; }
+.page-hero p   { font-size:14px; color:var(--muted); }
+
+/* ── 목록 ── */
+.notice-list { display:flex; flex-direction:column; gap:0; margin-top:32px; }
+.notice-item {
+  display:flex; align-items:center; gap:16px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.2s;
+  border-radius:0;
+  text-decoration:none;
+  color:var(--text);
+}
+.notice-item:first-child { border-top:1px solid var(--border); }
+.notice-item:hover { background:var(--surface); }
+.notice-pin {
+  flex-shrink:0;
+  font-size:11px; font-family:var(--mono);
+  color:var(--cyan); background:rgba(34,211,238,0.1);
+  border:1px solid rgba(34,211,238,0.2);
+  border-radius:4px; padding:2px 7px;
+}
+.notice-title-col { flex:1; min-width:0; }
+.notice-title { font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.notice-meta { display:flex; gap:12px; margin-top:4px; font-size:12px; color:var(--muted); font-family:var(--mono); }
+.notice-views { display:flex; align-items:center; gap:4px; }
+
+/* ── 상세 ── */
+.notice-detail { display:none; }
+.notice-detail.show { display:block; }
+.notice-back {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:13px; color:var(--muted); cursor:pointer;
+  margin-bottom:24px; transition:color 0.2s;
+  background:none; border:none; font-family:var(--sans);
+  padding:0;
+}
+.notice-back:hover { color:var(--cyan); }
+.notice-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:32px;
+}
+.notice-card-title { font-size:22px; font-weight:900; letter-spacing:-0.5px; margin-bottom:12px; }
+.notice-card-meta { display:flex; gap:16px; font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+.notice-card-body { font-size:15px; line-height:1.9; color:var(--text2); white-space:pre-line; }
+
+/* ── 관리자 버튼 ── */
+.admin-bar {
+  display:flex; justify-content:flex-end; align-items:center;
+  gap:10px; margin-bottom:16px;
+}
+.btn-admin-login {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12px; font-family:var(--mono);
+  color:var(--muted2); background:transparent;
+  border:1px solid var(--border); border-radius:6px;
+  padding:6px 12px; cursor:pointer; transition:all 0.2s;
+}
+.btn-admin-login:hover { color:var(--cyan); border-color:var(--cyan-dim); }
+.btn-admin-write {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:13px; font-weight:700;
+  color:#fff; background:var(--cyan-dim);
+  border:none; border-radius:6px;
+  padding:8px 16px; cursor:pointer; transition:opacity 0.2s;
+}
+.btn-admin-write:hover { opacity:0.85; }
+.btn-admin-logout { font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; font-family:var(--mono); }
+.btn-admin-logout:hover { color:var(--red); }
+
+/* ── 모달 (로그인 / 글쓰기) ── */
+.modal-bg {
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center;
+}
+.modal-bg.open { display:flex; }
+.modal-box {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:32px; width:100%; max-width:520px;
+  margin:16px; max-height:90vh; overflow-y:auto;
+}
+.modal-title { font-size:18px; font-weight:900; margin-bottom:24px; }
+.modal-field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.modal-label { font-size:12px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
+.modal-input {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:8px; color:var(--text);
+  padding:10px 14px; font-size:14px; font-family:var(--sans);
+  outline:none; transition:border-color 0.2s;
+}
+.modal-input:focus { border-color:var(--cyan-dim); }
+.modal-textarea { resize:vertical; min-height:180px; }
+.modal-check { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; }
+.modal-check input { width:16px; height:16px; accent-color:var(--cyan); }
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.modal-btn-cancel {
+  flex:1; padding:11px; border-radius:8px; border:1px solid var(--border);
+  background:transparent; color:var(--muted); font-size:14px; cursor:pointer;
+  font-family:var(--sans); transition:all 0.2s;
+}
+.modal-btn-cancel:hover { border-color:var(--border2); color:var(--text); }
+.modal-btn-submit {
+  flex:2; padding:11px; border-radius:8px; border:none;
+  background:var(--cyan-dim); color:#fff; font-size:14px;
+  font-weight:700; cursor:pointer; font-family:var(--sans); transition:opacity 0.2s;
+}
+.modal-btn-submit:hover { opacity:0.85; }
+.modal-error { font-size:12px; color:var(--red); margin-top:8px; display:none; }
+
+/* ── 삭제 버튼 (상세 내 관리자용) ── */
+.notice-admin-actions { display:flex; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+.btn-edit-notice { font-size:13px; color:var(--cyan); background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.2); border-radius:6px; padding:7px 14px; cursor:pointer; }
+.btn-del-notice  { font-size:13px; color:var(--red);  background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.2); border-radius:6px; padding:7px 14px; cursor:pointer; }
+
+/* ── 내보내기 안내 ── */
+.export-guide {
+  display:none; background:rgba(34,211,238,0.06);
+  border:1px solid rgba(34,211,238,0.2); border-radius:10px;
+  padding:16px 20px; margin-top:16px; font-size:13px; line-height:1.8;
+}
+.export-guide strong { color:var(--cyan); }
+.btn-export {
+  display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+  padding:8px 16px; border-radius:6px; background:var(--cyan-dim);
+  color:#fff; font-size:13px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.2s;
+}
+.btn-export:hover { opacity:0.85; }
+
+.empty-notice { text-align:center; padding:60px 20px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag">Notice</div>
+      <h1>공지사항</h1>
+      <p>에어브리지 국제특송의 공지 및 안내사항입니다.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- 관리자 바 -->
+      <div class="admin-bar" id="admin-bar">
+        <button class="btn-admin-login" onclick="openLogin()">🔐 관리자 로그인</button>
+      </div>
+
+      <!-- 내보내기 안내 -->
+      <div class="export-guide" id="export-guide">
+        ✅ 공지사항이 변경되었습니다.<br>
+        <strong>notices.json 파일을 다운로드</strong>한 후 GitHub에 업로드하면 반영됩니다.
+        <br>
+        <button class="btn-export" onclick="exportNotices()">⬇ notices.json 다운로드</button>
+      </div>
+
+      <!-- 목록 뷰 -->
+      <div id="list-view">
+        <div class="notice-list" id="notice-list"></div>
+        <div class="empty-notice" id="empty-notice" style="display:none;">등록된 공지사항이 없습니다.</div>
+      </div>
+
+      <!-- 상세 뷰 -->
+      <div class="notice-detail" id="detail-view">
+        <button class="notice-back" onclick="showList()">← 목록으로</button>
+        <div class="notice-card">
+          <div class="notice-card-title" id="detail-title"></div>
+          <div class="notice-card-meta" id="detail-meta"></div>
+          <div class="notice-card-body" id="detail-body"></div>
+          <div class="notice-admin-actions" id="detail-admin-actions" style="display:none;">
+            <button class="btn-edit-notice" onclick="openEdit()">✏️ 수정</button>
+            <button class="btn-del-notice"  onclick="deleteNotice()">🗑 삭제</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div><!-- /page-wrap -->
+
+<!-- 로그인 모달 -->
+<div class="modal-bg" id="login-modal">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-title">🔐 관리자 로그인</div>
+    <div class="modal-field">
+      <label class="modal-label">아이디</label>
+      <input class="modal-input" type="text" id="login-id" placeholder="admin">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">비밀번호</label>
+      <input class="modal-input" type="password" id="login-pw" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="modal-error" id="login-error">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal('login-modal')">취소</button>
+      <button class="modal-btn-submit" onclick="doLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 글쓰기/수정 모달 -->
+<div class="modal-bg" id="write-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="write-modal-title">📝 공지사항 작성</div>
+    <div class="modal-field">
+      <label class="modal-label">제목</label>
+      <input class="modal-input" type="text" id="write-title" placeholder="공지사항 제목을 입력하세요">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">내용</label>
+      <textarea class="modal-input modal-textarea" id="write-body" placeholder="공지사항 내용을 입력하세요"></textarea>
+    </div>
+    <label class="modal-check">
+      <input type="checkbox" id="write-pinned"> 📌 상단 고정 (중요 공지)
+    </label>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal('write-modal')">취소</button>
+      <button class="modal-btn-submit" onclick="saveNotice()">게시하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+// ══════════════════════════════════════════
+// 상태
+// ══════════════════════════════════════════
+const ADMIN_ID = 'admin';
+const ADMIN_PW = 'a12345';
+const STORAGE_KEY = 'ab_notices';
+const VIEWS_KEY   = 'ab_notice_views';
+
+let notices     = [];
+let isAdmin     = false;
+let editingId   = null;
+let currentId   = null;
+let hasChanges  = false;
+
+// ── 초기화 ──
+async function init() {
+  // 1) notices.json 먼저 로드
+  try {
+    const r = await fetch('notices.json?t=' + Date.now());
+    if (r.ok) notices = await r.json();
+  } catch(e) {}
+
+  // 2) localStorage 덮어쓰기 (관리자가 수정한 경우)
+  const local = localStorage.getItem(STORAGE_KEY);
+  if (local) {
+    try {
+      const parsed = JSON.parse(local);
+      if (parsed.length > 0) notices = parsed;
+    } catch(e) {}
+  }
+
+  // 3) 관리자 세션 확인
+  if (sessionStorage.getItem('ab_admin') === '1') {
+    isAdmin = true;
+    showAdminUI();
+  }
+
+  renderList();
+}
+
+// ══════════════════════════════════════════
+// 렌더
+// ══════════════════════════════════════════
+function renderList() {
+  const list  = document.getElementById('notice-list');
+  const empty = document.getElementById('empty-notice');
+  const views = getViews();
+
+  if (notices.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // 고정 → 최신순 정렬
+  const sorted = [...notices].sort((a,b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return b.id - a.id;
+  });
+
+  list.innerHTML = sorted.map(n => `
+    <div class="notice-item" onclick="showDetail(${n.id})">
+      ${n.pinned ? '<span class="notice-pin">📌 고정</span>' : ''}
+      <div class="notice-title-col">
+        <div class="notice-title">${escHtml(n.title)}</div>
+        <div class="notice-meta">
+          <span>📅 ${n.date}</span>
+          <span class="notice-views">👁 ${(views[n.id] || n.views || 0).toLocaleString()}</span>
+        </div>
+      </div>
+      <span style="color:var(--muted2);font-size:18px;">›</span>
+    </div>
+  `).join('');
+}
+
+function showDetail(id) {
+  const n = notices.find(x => x.id === id);
+  if (!n) return;
+  currentId = id;
+
+  // 조회수 증가
+  const views = getViews();
+  views[id] = (views[id] || n.views || 0) + 1;
+  saveViews(views);
+
+  document.getElementById('detail-title').textContent = n.title;
+  document.getElementById('detail-meta').innerHTML =
+    `<span>📅 ${n.date}</span><span>👁 ${views[id].toLocaleString()} 조회</span>${n.pinned ? '<span style="color:var(--cyan);">📌 고정</span>' : ''}`;
+  document.getElementById('detail-body').textContent = n.content;
+
+  // 관리자일 때 수정/삭제 버튼 표시
+  document.getElementById('detail-admin-actions').style.display = isAdmin ? 'flex' : 'none';
+
+  document.getElementById('list-view').style.display   = 'none';
+  document.getElementById('detail-view').classList.add('show');
+}
+
+function showList() {
+  currentId = null;
+  document.getElementById('detail-view').classList.remove('show');
+  document.getElementById('list-view').style.display = 'block';
+  renderList();
+}
+
+// ══════════════════════════════════════════
+// 관리자
+// ══════════════════════════════════════════
+function openLogin() {
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  openModal('login-modal');
+  setTimeout(() => document.getElementById('login-id').focus(), 100);
+}
+
+function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  if (id === ADMIN_ID && pw === ADMIN_PW) {
+    isAdmin = true;
+    sessionStorage.setItem('ab_admin', '1');
+    closeModal('login-modal');
+    showAdminUI();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  isAdmin = false;
+  sessionStorage.removeItem('ab_admin');
+  document.getElementById('admin-bar').innerHTML =
+    `<button class="btn-admin-login" onclick="openLogin()">🔐 관리자 로그인</button>`;
+  document.getElementById('detail-admin-actions').style.display = 'none';
+}
+
+function showAdminUI() {
+  document.getElementById('admin-bar').innerHTML = `
+    <span style="font-size:12px;color:var(--cyan);font-family:var(--mono);">✅ 관리자 로그인됨</span>
+    <button class="btn-admin-write" onclick="openWrite()">✏️ 새 공지 작성</button>
+    <button class="btn-admin-logout" onclick="doLogout()">로그아웃</button>
+  `;
+}
+
+function openWrite() {
+  editingId = null;
+  document.getElementById('write-modal-title').textContent = '📝 공지사항 작성';
+  document.getElementById('write-title').value = '';
+  document.getElementById('write-body').value  = '';
+  document.getElementById('write-pinned').checked = false;
+  openModal('write-modal');
+  setTimeout(() => document.getElementById('write-title').focus(), 100);
+}
+
+function openEdit() {
+  const n = notices.find(x => x.id === currentId);
+  if (!n) return;
+  editingId = n.id;
+  document.getElementById('write-modal-title').textContent = '✏️ 공지사항 수정';
+  document.getElementById('write-title').value  = n.title;
+  document.getElementById('write-body').value   = n.content;
+  document.getElementById('write-pinned').checked = !!n.pinned;
+  openModal('write-modal');
+}
+
+function saveNotice() {
+  const title   = document.getElementById('write-title').value.trim();
+  const content = document.getElementById('write-body').value.trim();
+  const pinned  = document.getElementById('write-pinned').checked;
+
+  if (!title) { alert('제목을 입력해주세요.'); return; }
+  if (!content) { alert('내용을 입력해주세요.'); return; }
+
+  const today = new Date().toISOString().slice(0,10);
+
+  if (editingId) {
+    // 수정
+    const idx = notices.findIndex(x => x.id === editingId);
+    if (idx >= 0) {
+      notices[idx] = { ...notices[idx], title, content, pinned, date: today };
+    }
+  } else {
+    // 신규
+    const newId = notices.length > 0 ? Math.max(...notices.map(x=>x.id)) + 1 : 1;
+    notices.unshift({ id: newId, title, content, date: today, views: 0, pinned });
+  }
+
+  // localStorage 저장
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notices));
+  hasChanges = true;
+  document.getElementById('export-guide').style.display = 'block';
+
+  closeModal('write-modal');
+  if (editingId && currentId) showDetail(currentId);
+  else showList();
+  editingId = null;
+}
+
+function deleteNotice() {
+  if (!confirm('이 공지사항을 삭제하시겠습니까?')) return;
+  notices = notices.filter(x => x.id !== currentId);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notices));
+  hasChanges = true;
+  document.getElementById('export-guide').style.display = 'block';
+  showList();
+}
+
+// ── notices.json 내보내기 ──
+function exportNotices() {
+  const blob = new Blob([JSON.stringify(notices, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'notices.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════════
+// 조회수 (localStorage)
+// ══════════════════════════════════════════
+function getViews() {
+  try { return JSON.parse(localStorage.getItem(VIEWS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveViews(v) { localStorage.setItem(VIEWS_KEY, JSON.stringify(v)); }
+
+// ══════════════════════════════════════════
+// 모달 유틸
+// ══════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e => {
+  ['login-modal','write-modal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (e.target === el) closeModal(id);
+  });
+});
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>

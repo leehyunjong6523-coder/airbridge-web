@@ -199,49 +199,57 @@
 /* 유류할증료 표시 바 */
 .hero-fuel {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  background: rgba(13,17,23,0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(42,51,71,0.9);
-  border-radius: 40px;
-  padding: 10px 20px;
+  background: rgba(13,17,23,0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(34,211,238,0.20);
+  border-radius: 18px;
+  padding: 18px 32px 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 .hf-label {
-  font-size: 11px;
-  color: var(--muted);
+  font-size: 12px;
+  color: var(--cyan);
   font-family: var(--mono);
-  letter-spacing: 0.5px;
-  padding-right: 10px;
-  border-right: 1px solid var(--border2);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.hf-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 .hf-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 0 10px;
+  gap: 4px;
+  padding: 0 22px;
   border-right: 1px solid var(--border2);
 }
 .hf-item:last-of-type { border-right: none; }
 .hf-carrier {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   font-family: var(--mono);
 }
 .hf-pct {
-  font-size: 15px;
+  font-size: 26px;
   font-weight: 900;
   font-family: var(--mono);
   color: var(--amber);
+  letter-spacing: -1px;
+  line-height: 1;
 }
 .hf-update {
-  font-size: 10px;
-  color: var(--muted2);
+  font-size: 11px;
+  color: var(--muted);
   font-family: var(--mono);
-  padding-left: 8px;
+  margin-top: 2px;
 }
 
 /* 슬라이드 인디케이터 */
@@ -449,9 +457,9 @@
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .hero { padding: 60px 0 48px; }
-  .hero-fuel { gap: 6px; padding: 8px 14px; }
-  .hf-item { padding: 0 6px; }
-  .hf-pct { font-size: 13px; }
+  .hero-fuel { padding: 14px 20px 12px; }
+  .hf-item { padding: 0 14px; }
+  .hf-pct { font-size: 22px; }
   .services-grid { grid-template-columns: 1fr 1fr; }
   .why-grid { grid-template-columns: 1fr; }
   .cta-banner { flex-direction: column; text-align: center; padding: 40px 24px; }
@@ -462,8 +470,8 @@
 @media (max-width: 600px) {
   .services-grid { grid-template-columns: 1fr; }
   .hero-badge { font-size: 10px; padding: 4px 12px 4px 9px; }
-  .hero-fuel { flex-wrap: wrap; gap: 4px; }
-  .hf-label { display: none; }
+  .hf-item { padding: 0 10px; }
+  .hf-pct { font-size: 20px; }
 }
 </style>
 </head>
@@ -514,17 +522,19 @@
         <!-- 현재 유류할증료 -->
         <div class="hero-fuel anim-fadeup anim-d4">
           <span class="hf-label">🔥 현재 유류할증료</span>
-          <div class="hf-item">
-            <span class="hf-carrier" style="color:#ef4444;">DHL</span>
-            <span class="hf-pct" id="idx-fuel-dhl">39%</span>
-          </div>
-          <div class="hf-item">
-            <span class="hf-carrier" style="color:#a855f7;">FedEx</span>
-            <span class="hf-pct" id="idx-fuel-fedex">46%</span>
-          </div>
-          <div class="hf-item">
-            <span class="hf-carrier" style="color:#f97316;">UPS</span>
-            <span class="hf-pct" id="idx-fuel-ups">46%</span>
+          <div class="hf-row">
+            <div class="hf-item">
+              <span class="hf-carrier" style="color:#ef4444;">DHL</span>
+              <span class="hf-pct" id="idx-fuel-dhl">39%</span>
+            </div>
+            <div class="hf-item">
+              <span class="hf-carrier" style="color:#a855f7;">FedEx</span>
+              <span class="hf-pct" id="idx-fuel-fedex">46%</span>
+            </div>
+            <div class="hf-item">
+              <span class="hf-carrier" style="color:#f97316;">UPS</span>
+              <span class="hf-pct" id="idx-fuel-ups">46%</span>
+            </div>
           </div>
           <span class="hf-update">🔄 매주 업데이트 · <span id="idx-fuel-date">-</span></span>
         </div>
