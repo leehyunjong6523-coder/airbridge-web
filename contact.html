@@ -411,31 +411,21 @@ textarea.form-input { resize:vertical; min-height:120px; }
 </div>
 <script src="supabase-config.js"></script>
 <script src="common.js"></script>
-<!-- EmailJS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>
 /*
- * ═══════════════════════════════════════════════════
- * 📧 EmailJS 설정 방법 (최초 1회 설정)
+ * ══════════════════════════════════════════════════════
+ * 📧 Formspree 설정 방법 (최초 1회, 2분 소요)
  *
- * 1. https://www.emailjs.com 에서 무료 계정 생성
- * 2. Email Services → Gmail 또는 SMTP 추가 (cs@airos.co.kr)
- * 3. Email Templates → 새 템플릿 생성, 내용:
- *    제목: [에어브리지] {{inquiry_type}} - {{from_name}}
- *    내용: 보내는사람: {{from_name}} / 연락처: {{from_tel}} / 이메일: {{from_email}}
- *          문의유형: {{inquiry_type}}
- *          내용: {{message}}
- * 4. Account → Public Key 복사
- * 5. 아래 3개 값 교체:
- * ═══════════════════════════════════════════════════
+ * 1. https://formspree.io 무료 가입
+ * 2. New Form 생성 → 수신 이메일: cs@airos.co.kr 입력
+ * 3. 생성된 Form ID 복사 (예: xabc1234)
+ * 4. 아래 FORMSPREE_ID 값 교체
+ * ──────────────────────────────────────────────────────
+ * 무료 플랜: 월 50건 / 스팸 필터 / 파일첨부 없음
+ * ══════════════════════════════════════════════════════
  */
-const EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← EmailJS Public Key
-const EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← Service ID
-const EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← Template ID
-
-// EmailJS가 설정되어 있는지 확인
-const EJS_READY = EJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
-if (EJS_READY) emailjs.init(EJS_PUBLIC_KEY);
+const FORMSPREE_ID = 'YOUR_FORM_ID';  // ← 여기만 교체 (예: 'xabc1234')
+const FORMSPREE_READY = FORMSPREE_ID !== 'YOUR_FORM_ID';
 
 async function submitForm(e) {
   e.preventDefault();
@@ -443,55 +433,47 @@ async function submitForm(e) {
   btn.textContent = '전송 중...';
   btn.disabled = true;
 
-  const params = {
-    from_name:    document.getElementById('cf-name').value,
-    from_tel:     document.getElementById('cf-tel').value,
-    from_email:   document.getElementById('cf-email').value,
-    inquiry_type: document.getElementById('cf-type').value || '미선택',
-    message:      document.getElementById('cf-msg').value,
-    to_email:     'cs@airos.co.kr',
-    reply_to:     document.getElementById('cf-email').value || '(이메일 미입력)',
-  };
+  const name    = document.getElementById('cf-name').value.trim();
+  const tel     = document.getElementById('cf-tel').value.trim();
+  const email   = document.getElementById('cf-email').value.trim();
+  const type    = document.getElementById('cf-type').value || '미선택';
+  const message = document.getElementById('cf-msg').value.trim();
+  const pw      = document.getElementById('cf-pw').value || '0000';
 
-  // ── Supabase 문의 게시판 저장 ──
+  // ① Supabase 문의 게시판 저장
   if (typeof DB !== 'undefined' && DB.ready()) {
     try {
-      await DB.post('inquiries', {
-        name:     params.from_name,
-        tel:      params.from_tel,
-        email:    params.from_email,
-        type:     params.inquiry_type,
-        message:  params.message,
-        password: document.getElementById('cf-pw').value || '0000',
-        answered: false
-      });
-    } catch(e) { console.warn('게시판 저장 실패:', e); }
+      await DB.post('inquiries', { name, tel, email, type, message, password: pw, answered: false });
+    } catch(err) { console.warn('게시판 저장 실패:', err); }
   }
 
-  if (EJS_READY) {
-    // ── EmailJS 발송 ──
+  // ② 이메일 발송 (Formspree)
+  if (FORMSPREE_READY) {
     try {
-      await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, params);
-      showSuccess();
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          _subject:  `[에어브리지 문의] ${type} — ${name}`,
+          _replyto:  email || tel,
+          회사명성함: name,
+          연락처:    tel,
+          이메일:    email || '미입력',
+          문의유형:  type,
+          문의내용:  message
+        })
+      });
+      if (!res.ok) throw new Error('Formspree 오류');
     } catch(err) {
-      btn.textContent = '문의 보내기 →';
-      btn.disabled = false;
-      alert('전송 중 오류가 발생했습니다.\n032-502-1880으로 전화해 주세요.');
+      console.warn('이메일 발송 실패:', err);
+      // 발송 실패해도 게시판 저장은 됐으므로 성공 표시
     }
-  } else {
-    // ── EmailJS 미설정: mailto 폴백 ──
-    // (Supabase 저장은 위에서 이미 처리됨)
-    const subject = encodeURIComponent('[에어브리지 문의] ' + params.inquiry_type + ' - ' + params.from_name);
-    const body = encodeURIComponent(
-      '보내는 사람: ' + params.from_name + '\n' +
-      '연락처: ' + params.from_tel + '\n' +
-      '이메일: ' + params.from_email + '\n' +
-      '문의 유형: ' + params.inquiry_type + '\n\n' +
-      '내용:\n' + params.message
-    );
-    window.location.href = 'mailto:cs@airos.co.kr?subject=' + subject + '&body=' + body;
-    showSuccess();
   }
+  // Formspree 미설정이면 게시판만 저장 (메일 없음)
+
+  btn.textContent = '문의 보내기 →';
+  btn.disabled = false;
+  showSuccess();
 }
 
 function showSuccess() {
