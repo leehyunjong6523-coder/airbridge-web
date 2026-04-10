@@ -150,6 +150,55 @@ img { max-width: 100%; display: block; }
   transition: all 0.3s;
 }
 
+
+/* ════════════════════════════════════════
+   LED 전광판 (nav 중앙)
+════════════════════════════════════════ */
+.nav-ticker {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0 20px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  /* 양쪽 페이드 */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+.nav-ticker-inner {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--cyan);
+  letter-spacing: 0.3px;
+  animation: tickerScroll 38s linear infinite;
+  will-change: transform;
+}
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.nav-ticker:hover .nav-ticker-inner { animation-play-state: paused; }
+
+@media (max-width: 900px) {
+  .nav-ticker { display: none; }
+}
+
 /* Mobile nav */
 .nav-mobile {
   display: none;

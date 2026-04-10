@@ -7,13 +7,17 @@
   // ── NAV HTML ──
   const NAV_HTML = `
 <nav class="nav" id="main-nav">
-  <a href="/" class="nav-logo">
+  <a href="/" class="nav-logo" style="margin-right:0;flex-shrink:0;">
     <div class="nav-logo-mark">AB</div>
     <div class="nav-logo-text">
       <div class="nav-logo-ko">(주) 에어브리지</div>
       <div class="nav-logo-en">AIRBRIDGE Co., Ltd.</div>
     </div>
   </a>
+  <!-- LED 전광판 -->
+  <div class="nav-ticker" id="nav-ticker">
+    <div class="nav-ticker-inner" id="nav-ticker-inner"></div>
+  </div>
   <ul class="nav-links">
     <li><a href="/">홈</a></li>
     <li><a href="/about.html">회사소개</a></li>
@@ -105,6 +109,24 @@
     const m = document.getElementById('nav-mobile');
     m.classList.toggle('open');
   };
+
+  // ── LED 전광판 ──
+  (function(){
+    const WORK_START = 9, WORK_END = 18; // 평일 09:00~18:00
+    const now  = new Date();
+    const day  = now.getDay(); // 0=일 6=토
+    const hour = now.getHours();
+    const isWork = day >= 1 && day <= 5 && hour >= WORK_START && hour < WORK_END;
+
+    const MSG_WORK = '유선(032-502-1880)으로 연락 주시면 조금 더 빠르고 상세한 안내를 받으실 수 있습니다.';
+    const MSG_OFF  = '문의하기로 남겨주시면 업무개시 후 최대한 빠르게 회신드릴 수 있도록 하겠습니다.';
+    const msg = isWork ? MSG_WORK : MSG_OFF;
+
+    const inner = document.getElementById('nav-ticker-inner');
+    if (!inner) return;
+    // 텍스트를 여러번 반복해서 끊김 없이
+    inner.textContent = msg + '　　　　　' + msg + '　　　　　' + msg;
+  })();
 
   // ── SCROLL NAV SHADOW ──
   window.addEventListener('scroll', () => {

@@ -88,7 +88,7 @@ body {
 
 /* ── SECTION TITLE ── */
 .section-label {
-  font-size: 10px;
+  font-size: 13px;
   font-family: var(--mono);
   color: var(--cyan);
   text-transform: uppercase;
@@ -105,11 +105,11 @@ body {
   margin-bottom: 20px;
 }
 .card-title {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -127,11 +127,11 @@ body {
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   font-family: var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
 }
 .form-control {
   background: var(--bg);
@@ -139,7 +139,7 @@ body {
   border-radius: 8px;
   color: var(--text);
   padding: 10px 14px;
-  font-size: 14px;
+  font-size: 16px;
   font-family: var(--sans);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -166,7 +166,7 @@ select.form-control option { background: var(--surface); }
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 15px;
   font-family: var(--sans);
   font-weight: 500;
   transition: all 0.2s;
@@ -179,12 +179,12 @@ select.form-control option { background: var(--surface); }
 /* ── CT TABLE ── */
 .ct-table { width: 100%; border-collapse: collapse; }
 .ct-table th {
-  font-size: 10px;
+  font-size: 13px;
   font-family: var(--mono);
   color: var(--muted2);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 8px 10px;
+  letter-spacing: 0.5px;
+  padding: 10px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
@@ -195,7 +195,7 @@ select.form-control option { background: var(--surface); }
   border-radius: 6px;
   color: var(--text);
   padding: 7px 10px;
-  font-size: 13px;
+  font-size: 15px;
   font-family: var(--mono);
   width: 100%;
   outline: none;
@@ -205,7 +205,7 @@ select.form-control option { background: var(--surface); }
 .ct-table td input:focus { border-color: var(--cyan-dim); }
 .ct-vol {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   text-align: right;
   padding: 0 10px;
@@ -248,7 +248,7 @@ select.form-control option { background: var(--surface); }
   gap: 5px;
 }
 .disc-label {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
   font-family: var(--mono);
   display: flex; align-items: center; gap: 6px;
@@ -267,8 +267,8 @@ select.form-control option { background: var(--surface); }
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  padding: 10px 32px 10px 14px;
-  font-size: 14px;
+  padding: 12px 36px 12px 14px;
+  font-size: 16px;
   font-family: var(--mono);
   width: 100%;
   outline: none;
@@ -281,7 +281,7 @@ select.form-control option { background: var(--surface); }
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted2);
   font-family: var(--mono);
   pointer-events: none;
@@ -333,12 +333,12 @@ select.form-control option { background: var(--surface); }
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 5px 12px;
+  padding: 7px 14px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 15px;
 }
 .fuel-chip .fc-label { color: var(--muted); }
-.fuel-chip .fc-val   { color: var(--amber); font-weight: 600; }
+.fuel-chip .fc-val   { color: var(--amber); font-weight: 700; font-size: 17px; }
 
 /* ── RESULTS ── */
 #results { display: none; }
@@ -349,11 +349,11 @@ select.form-control option { background: var(--surface); }
   margin-bottom: 24px;
 }
 .results-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: -0.5px;
 }
-.results-sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.results-sub { font-size: 14px; color: var(--muted); font-family: var(--mono); }
 .wt-summary {
   display: flex;
   gap: 20px;
@@ -365,9 +365,9 @@ select.form-control option { background: var(--surface); }
   flex-direction: column;
   gap: 2px;
 }
-.wt-chip .wc-label { font-size: 10px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.8px; }
-.wt-chip .wc-val   { font-size: 16px; font-weight: 700; font-family: var(--mono); color: var(--cyan); }
-.wt-chip .wc-unit  { font-size: 11px; color: var(--muted2); font-family: var(--mono); }
+.wt-chip .wc-label { font-size: 12px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.8px; }
+.wt-chip .wc-val   { font-size: 19px; font-weight: 700; font-family: var(--mono); color: var(--cyan); }
+.wt-chip .wc-unit  { font-size: 13px; color: var(--muted2); font-family: var(--mono); }
 
 /* ── CARRIER CARDS ── */
 .carrier-grid {
@@ -572,12 +572,12 @@ select.form-control option { background: var(--surface); }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 2px 8px;
+  padding: 4px 10px;
   font-family: var(--mono);
 }
 
@@ -724,6 +724,10 @@ select.form-control option { background: var(--surface); }
   <!-- 할인율 -->
   <div class="card">
     <div class="card-title">할인율 입력</div>
+    <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.15);border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--muted);line-height:1.75;">
+      여기에 임의로 계산하고 싶은 할인율을 넣어 계산해보세요.<br>
+      <span style="color:var(--amber);font-size:12px;">⚠ 단, 입력하신 할인율은 실제 진행 시 적용되는 할인율과 상이할 수 있습니다.</span>
+    </div>
     <div class="disc-grid" id="disc-grid">
       <div class="disc-item">
         <div class="disc-label"><span class="disc-badge disc-dhl"></span>DHL Express</div>

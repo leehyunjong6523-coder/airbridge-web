@@ -321,6 +321,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
             <div class="fs-icon">✅</div>
             <h3>문의가 접수되었습니다!</h3>
             <p>빠른 시일 내에 담당자가 연락드리겠습니다.<br>급한 문의는 <strong>032-502-1880</strong>으로 전화해 주세요.</p>
+            <p style="font-size:13px;color:var(--muted);margin-top:12px;">문의게시판에서 비밀번호로 답변 확인이 가능합니다.</p>
             <br>
             <a href="/calculator.html" class="btn btn-primary" style="display:inline-flex;margin-top:8px;">✈ 운임 계산기</a>
             <a href="/inquiries.html" class="btn btn-outline" style="display:inline-flex;margin-top:8px;">📋 내 문의 확인</a>
@@ -424,7 +425,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
  * 무료 플랜: 월 50건 / 스팸 필터 / 파일첨부 없음
  * ══════════════════════════════════════════════════════
  */
-const FORMSPREE_ID = 'xjgpqwnl';  // ← 여기만 교체 (예: 'xabc1234')
+const FORMSPREE_ID = 'YOUR_FORM_ID';  // ← 여기만 교체 (예: 'xabc1234')
 const FORMSPREE_READY = FORMSPREE_ID !== 'YOUR_FORM_ID';
 
 async function submitForm(e) {
@@ -455,6 +456,7 @@ async function submitForm(e) {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           _subject:  `[에어브리지 문의] ${type} — ${name}`,
+          email:     email || '',     /* Formspree가 이 필드를 reply-to로 자동 설정 */
           _replyto:  email || tel,
           회사명성함: name,
           연락처:    tel,
