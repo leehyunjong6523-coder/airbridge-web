@@ -363,7 +363,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
         <!-- 지도 헤더 -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
           <div style="font-size:15px;font-weight:700;">📍 오시는 길</div>
-          <a href="https://map.naver.com/p/search/인천광역시%20부평구%20수변로19번길%205%20새한빌딩"
+          <a href="https://map.naver.com/p/search/인천%20부평구%20수변로19번길%205%20새한빌딩"
              target="_blank" rel="noopener"
              style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#03c75a;color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:opacity 0.2s;"
              onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
@@ -374,7 +374,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
         <!-- OpenStreetMap 임베드 (부평구 수변로) -->
         <div class="map-area" style="position:relative;border-radius:16px;overflow:hidden;height:320px;border:1px solid var(--border);">
           <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=126.7210%2C37.4882%2C126.7410%2C37.5042&layer=mapnik&marker=37.4965%2C126.7310"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=126.7140%2C37.4920%2C126.7320%2C37.5010&layer=mapnik&marker=37.4963%2C126.7213"
             style="width:100%;height:100%;border:none;"
             allowfullscreen loading="lazy"
             title="에어브리지 국제특송 위치">
@@ -425,7 +425,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
  * 무료 플랜: 월 50건 / 스팸 필터 / 파일첨부 없음
  * ══════════════════════════════════════════════════════
  */
-const FORMSPREE_ID = 'xjgpqwnl';  // ← 여기만 교체 (예: 'xabc1234')
+const FORMSPREE_ID = 'YOUR_FORM_ID';  // ← 여기만 교체 (예: 'xabc1234')
 const FORMSPREE_READY = FORMSPREE_ID !== 'YOUR_FORM_ID';
 
 async function submitForm(e) {
