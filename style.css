@@ -190,7 +190,7 @@ img { max-width: 100%; display: block; }
   letter-spacing: 0.6px;
   /* 스크롤 + 색상 번쩍 동시 */
   animation:
-    tickerScroll  36s linear      infinite,
+    tickerScroll  29s linear      infinite,
     tickerFlash   1.6s steps(1, end) infinite;
   will-change: transform, color;
 }
