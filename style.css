@@ -158,43 +158,57 @@ img { max-width: 100%; display: block; }
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  margin: 0 20px;
-  height: 28px;
+  margin: 0 16px;
+  height: 26px;
   display: flex;
   align-items: center;
   position: relative;
-  /* 양쪽 페이드 */
+  background: rgba(34,211,238,0.04);
+  border: 1px solid rgba(34,211,238,0.15);
+  border-radius: 4px;
   mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 8%,
-    black 92%,
-    transparent 100%
+    to right, transparent 0%, black 5%, black 95%, transparent 100%
   );
   -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 8%,
-    black 92%,
-    transparent 100%
+    to right, transparent 0%, black 5%, black 95%, transparent 100%
   );
 }
 .nav-ticker-inner {
   display: inline-block;
   white-space: nowrap;
   font-size: 12px;
+  font-weight: 600;
   font-family: var(--mono);
-  color: var(--cyan);
-  letter-spacing: 0.3px;
-  animation: tickerScroll 38s linear infinite;
+  letter-spacing: 0.5px;
+  animation: tickerScroll 36s linear infinite, tickerGlow 2.4s ease-in-out infinite;
   will-change: transform;
+  color: var(--cyan);
 }
 @keyframes tickerScroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-33.333%); }
 }
-.nav-ticker:hover .nav-ticker-inner { animation-play-state: paused; }
-
+@keyframes tickerGlow {
+  0%,100% {
+    color: #22d3ee;
+    text-shadow: 0 0 6px rgba(34,211,238,0.7), 0 0 12px rgba(34,211,238,0.4);
+  }
+  25% {
+    color: #67e8f9;
+    text-shadow: 0 0 10px rgba(103,232,249,0.9), 0 0 20px rgba(34,211,238,0.6), 0 0 30px rgba(34,211,238,0.3);
+  }
+  50% {
+    color: #a5f3fc;
+    text-shadow: 0 0 14px rgba(165,243,252,1), 0 0 28px rgba(34,211,238,0.8), 0 0 42px rgba(34,211,238,0.4);
+  }
+  75% {
+    color: #67e8f9;
+    text-shadow: 0 0 10px rgba(103,232,249,0.9), 0 0 20px rgba(34,211,238,0.6), 0 0 30px rgba(34,211,238,0.3);
+  }
+}
+.nav-ticker:hover .nav-ticker-inner {
+  animation-play-state: paused;
+}
 @media (max-width: 900px) {
   .nav-ticker { display: none; }
 }
