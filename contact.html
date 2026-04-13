@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+if (location.hostname === 'www.airbridge.kr') {
+  location.replace(location.href.replace('www.airbridge.kr', 'airbridge.kr'));
+}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>문의/오시는길 — 에어브리지 국제특송</title>
@@ -386,7 +391,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
             <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;">🚗 자가용</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.7;">경인고속도로 부평IC 방면<br>수변로19번길 5 새한빌딩 1층</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">경인로(46번 국도) 부개사거리<br>수변로19번길 5 새한빌딩 1층</div>
           </div>
         </div>
       </div>
@@ -410,7 +415,7 @@ textarea.form-input { resize:vertical; min-height:120px; }
  * 무료 플랜: 월 50건 / 스팸 필터 / 파일첨부 없음
  * ══════════════════════════════════════════════════════
  */
-const FORMSPREE_ID = 'xjgpqwnl';  // ← 여기만 교체 (예: 'xabc1234')
+const FORMSPREE_ID = 'YOUR_FORM_ID';  // ← 여기만 교체 (예: 'xabc1234')
 const FORMSPREE_READY = FORMSPREE_ID !== 'YOUR_FORM_ID';
 
 async function submitForm(e) {
@@ -479,7 +484,7 @@ function showSuccess() {
   5. GitHub 업로드 → 완료
 ===================================================== -->
 <script>
-var NAVER_CLIENT_ID = 'wvdaqqqax0'; // ← 여기만 교체
+var NAVER_CLIENT_ID = 'YOUR_NAVER_CLIENT_ID'; // ← 여기만 교체
 </script>
 <script>
 (function() {
