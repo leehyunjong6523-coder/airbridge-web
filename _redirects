@@ -1,7 +1,0 @@
-# Clean URLs
-/about       /about.html      200
-/services    /services.html   200
-/calculator  /calculator.html 200
-/contact     /contact.html    200
-/notices     /notices.html    200
-/inquiries   /inquiries.html  200
