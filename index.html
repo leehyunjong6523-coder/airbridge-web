@@ -475,49 +475,53 @@
 }
 
 /* ── 공지 팝업 ── */
-/* 공지 팝업 — 우측 상단, nav 바로 아래 */
-.popup-wrap{display:none;position:fixed;top:calc(var(--nav-h) + 12px);right:20px;z-index:900;width:310px;animation:popupSlide .35s ease;}
-.popup-wrap.open{display:block;}
-@keyframes popupSlide{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-.popup-box{background:var(--surface);border:1px solid rgba(34,211,238,0.28);border-radius:14px;padding:20px;box-shadow:0 8px 40px rgba(0,0,0,.55);position:relative;}
-.popup-x{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+/* 공지 팝업 컨테이너 — 우측 상단, 계단식 세로 배치 */
+.popup-container{
+  position:fixed;
+  top:calc(var(--nav-h) + 12px);
+  right:20px;
+  z-index:900;
+  width:300px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  pointer-events:none;
+}
+.popup-item{
+  pointer-events:all;
+  animation:popupSlide .35s ease both;
+  background:var(--surface);
+  border:1px solid rgba(34,211,238,0.28);
+  border-radius:12px;
+  padding:16px 18px;
+  box-shadow:0 6px 32px rgba(0,0,0,.55);
+  position:relative;
+}
+.popup-item:nth-child(2){animation-delay:.08s;}
+.popup-item:nth-child(3){animation-delay:.16s;}
+.popup-item:nth-child(4){animation-delay:.24s;}
+.popup-item:nth-child(5){animation-delay:.32s;}
+@keyframes popupSlide{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.popup-x{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .popup-x:hover{background:var(--border2);color:var(--text);}
-.popup-tag{font-size:10px;font-family:var(--mono);color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
-.popup-title{font-size:15px;font-weight:900;letter-spacing:-.3px;margin-bottom:6px;line-height:1.3;padding-right:24px;}
-.popup-date{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:10px;}
-.popup-body{font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-line;max-height:90px;overflow-y:auto;margin-bottom:14px;}
-.popup-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;}
-.popup-today{font-size:11px;color:var(--muted2);cursor:pointer;background:none;border:none;font-family:var(--sans);white-space:nowrap;}
+.popup-tag{font-size:10px;font-family:var(--mono);color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.popup-title{font-size:13px;font-weight:900;letter-spacing:-.2px;margin-bottom:4px;line-height:1.3;padding-right:22px;}
+.popup-date{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-bottom:8px;}
+.popup-body{font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-line;max-height:72px;overflow-y:auto;margin-bottom:10px;}
+.popup-actions{display:flex;gap:6px;align-items:center;justify-content:space-between;}
+.popup-today{font-size:10px;color:var(--muted2);cursor:pointer;background:none;border:none;font-family:var(--sans);white-space:nowrap;}
 .popup-today:hover{color:var(--text);}
-.popup-close{padding:7px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.popup-close{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
 .popup-close:hover{border-color:var(--border2);color:var(--text);}
-.popup-more{padding:7px 12px;border-radius:7px;border:none;background:var(--cyan-dim);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;transition:opacity .2s;}
+.popup-more{padding:5px 10px;border-radius:6px;border:none;background:var(--cyan-dim);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;transition:opacity .2s;}
 .popup-more:hover{opacity:.85;}
-@media(max-width:480px){.popup-wrap{right:10px;left:10px;width:auto;}}
+@media(max-width:480px){.popup-container{right:10px;left:10px;width:auto;}}
 </style>
 </head>
 <body>
 
-<!-- 공지 팝업 — 우측 상단, 최대 5개 순서대로 표시 -->
-<div class="popup-wrap" id="notice-popup" style="display:none;">
-  <div class="popup-box">
-    <button class="popup-x" onclick="popupNext()" title="닫기">×</button>
-    <div class="popup-tag">
-      📢 공지사항 &nbsp;
-      <span id="popup-counter" style="color:var(--muted);font-size:10px;"></span>
-    </div>
-    <div class="popup-title" id="popup-title"></div>
-    <div class="popup-date" id="popup-date"></div>
-    <div class="popup-body" id="popup-body"></div>
-    <div class="popup-actions">
-      <button class="popup-today" onclick="closePopupToday()">오늘 하루 보지 않기</button>
-      <div style="display:flex;gap:6px;">
-        <button class="popup-close" onclick="popupNext()">닫기</button>
-        <a class="popup-more" href="/notices.html">전체보기</a>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- 공지 팝업 컨테이너 — JS로 동적 생성 -->
+<div class="popup-container" id="popup-container"></div>
 
 <div class="page-wrap">
 
@@ -811,100 +815,83 @@
 })();
 
 
-/* ── 공지 팝업 (최대 5개, 게시일 포함 7일간) ── */
-let _popupList = [];
-let _popupIdx  = 0;
-
+/* ── 공지 팝업 (최대 5개 동시 계단식, 게시일 포함 7일간) ── */
 (async function(){
-  // 오늘 하루 닫기 확인
   const hideUntil = localStorage.getItem('ab_popup_hide');
   if (hideUntil && new Date() < new Date(hideUntil)) return;
-
-  // 이미 이 세션에서 모두 본 경우 스킵
   if (sessionStorage.getItem('ab_popup_done')) return;
 
-  // 7일 기준: 게시일(created_at) 포함 7일 = 게시일 00:00:00 기준 +7일
   const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // 오늘 포함 7일
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
   sevenDaysAgo.setHours(0, 0, 0, 0);
   const cutoff = sevenDaysAgo.toISOString();
 
+  let list = [];
   try {
     if (typeof DB !== 'undefined' && DB.ready()) {
       const r = await DB.get('notices',
-        `created_at=gte.${cutoff}&order=pinned.desc,created_at.desc&limit=5`
-      );
-      if (r && r.length) _popupList = r;
+        `created_at=gte.${cutoff}&order=pinned.desc,created_at.desc&limit=5`);
+      if (r && r.length) list = r;
     } else {
       const r = await fetch('notices.json?t=' + Date.now());
       if (r.ok) {
         const ns = await r.json();
-        _popupList = ns.filter(n => {
+        list = ns.filter(n => {
           const d = new Date(n.created_at || n.date || '2000-01-01');
-          d.setHours(0, 0, 0, 0);
+          d.setHours(0,0,0,0);
           return d >= sevenDaysAgo;
         }).slice(0, 5);
       }
     }
   } catch(e) {}
 
-  if (!_popupList.length) return;
+  if (!list.length) return;
 
-  // 이미 본 공지 ID 목록 (오늘 하루 보지 않기 아닌 경우, 세션 내에서만 추적)
-  _popupIdx = 0;
-  showPopupItem(_popupIdx);
+  const container = document.getElementById('popup-container');
+  container.innerHTML = '';
+
+  list.forEach(function(n, idx) {
+    const d = new Date(n.created_at || n.date);
+    const dateStr = d.toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'});
+    const body = (n.content || '');
+    const bodyShort = body.length > 120 ? body.slice(0, 120) + '...' : body;
+    const itemId = 'popup-item-' + idx;
+
+    const div = document.createElement('div');
+    div.className = 'popup-item';
+    div.id = itemId;
+    div.innerHTML =
+      '<button class="popup-x" onclick="closeOnePopup('' + itemId + '')" title="닫기">×</button>' +
+      '<div class="popup-tag">📢 공지사항</div>' +
+      '<div class="popup-title">' + (n.title||'').replace(/</g,'&lt;') + '</div>' +
+      '<div class="popup-date">📅 ' + dateStr + '</div>' +
+      '<div class="popup-body">' + bodyShort.replace(/</g,'&lt;').replace(/
+/g,'<br>') + '</div>' +
+      '<div class="popup-actions">' +
+        '<button class="popup-today" onclick="closePopupToday()">오늘 하루 보지 않기</button>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="popup-close" onclick="closeOnePopup('' + itemId + '')">닫기</button>' +
+          '<a class="popup-more" href="/notices.html">전체보기</a>' +
+        '</div>' +
+      '</div>';
+    container.appendChild(div);
+  });
 })();
 
-function showPopupItem(idx) {
-  if (idx >= _popupList.length) {
-    // 모두 표시 완료
-    document.getElementById('notice-popup').style.display = 'none';
-    sessionStorage.setItem('ab_popup_done', '1');
-    return;
-  }
-  const n = _popupList[idx];
-  const total = _popupList.length;
-
-  document.getElementById('popup-counter').textContent =
-    total > 1 ? `(${idx+1}/${total})` : '';
-  document.getElementById('popup-title').textContent = n.title;
-
-  const d = new Date(n.created_at || n.date);
-  document.getElementById('popup-date').textContent =
-    '📅 ' + d.toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'});
-
-  const body = n.content || '';
-  document.getElementById('popup-body').textContent =
-    body.length > 180 ? body.slice(0, 180) + '...' : body;
-
-  const wrap = document.getElementById('notice-popup');
-  wrap.style.display = 'block';
-  // 애니메이션 재실행
-  wrap.style.animation = 'none';
-  wrap.offsetHeight; // reflow
-  wrap.style.animation = '';
-}
-
-function popupNext() {
-  _popupIdx++;
-  if (_popupIdx >= _popupList.length) {
-    document.getElementById('notice-popup').style.display = 'none';
-    sessionStorage.setItem('ab_popup_done', '1');
-  } else {
-    showPopupItem(_popupIdx);
+function closeOnePopup(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    el.style.transition = 'opacity .25s, transform .25s';
+    setTimeout(function(){ el.remove(); }, 260);
   }
 }
-
-function closePopup() {
-  document.getElementById('notice-popup').style.display = 'none';
-  sessionStorage.setItem('ab_popup_done', '1');
-}
-
 function closePopupToday() {
   const tomorrow = new Date();
   tomorrow.setHours(23, 59, 59, 0);
   localStorage.setItem('ab_popup_hide', tomorrow.toISOString());
-  document.getElementById('notice-popup').style.display = 'none';
+  document.getElementById('popup-container').innerHTML = '';
 }
 
 /* ── 유류할증료 로드 (fuel.json) ── */
