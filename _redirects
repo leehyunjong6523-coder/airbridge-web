@@ -1,6 +1,3 @@
-# www → non-www 리다이렉트 (301)
-https://www.airbridge.kr/* https://airbridge.kr/:splat 301
-
 # Clean URLs
 /about       /about.html      200
 /services    /services.html   200
