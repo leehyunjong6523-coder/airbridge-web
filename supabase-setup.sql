@@ -40,3 +40,16 @@ insert into public.notices (title, content, pinned) values
   ('홈페이지 오픈 안내', '(주) 에어브리지 공식 홈페이지가 오픈되었습니다.' || chr(10) || chr(10) ||
    'DHL·FedEx·UPS 실시간 운임 계산기를 통해 편리하게 국제특송 운임을 조회하실 수 있습니다.' || chr(10) || chr(10) ||
    '문의사항은 고객센터(032-502-1880) 또는 cs@airos.co.kr로 연락해 주세요.', true);
+
+-- ──────────────────────────────────────
+-- 3. 운임계산기 사용 이력 테이블 (추가)
+-- ──────────────────────────────────────
+create table if not exists public.calc_logs (
+  id         bigserial primary key,
+  country    text,
+  mode       text,
+  ua         text,
+  created_at timestamptz default now()
+);
+alter table public.calc_logs enable row level security;
+create policy "calc_logs_all" on public.calc_logs for all using (true) with check (true);

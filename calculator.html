@@ -982,6 +982,16 @@ function upsLookup(w, zi, isDoc, imp) {
 // MAIN CALCULATE
 // ══════════════════════════════════════════════════════════
 function calculate() {
+  // ── 사용 이력 카운트 (Supabase) ──
+  if (typeof DB !== 'undefined' && DB.ready()) {
+    const country_val = document.getElementById('dest-country').value.trim();
+    const mode_val = document.getElementById('btn-export')?.classList.contains('active') ? '수출' : '수입';
+    DB.post('calc_logs', {
+      country: country_val || '(미선택)',
+      mode:    mode_val,
+      ua:      navigator.userAgent.slice(0, 100)
+    }).catch(()=>{});
+  }
   const country = document.getElementById('dest-country').value.trim();
   if (!country || !DHL_ZONE_MAP[country]) {
     alert('목적지 국가를 선택해주세요.\n검색창에 국가명을 입력하면 목록이 나타납니다.');
@@ -1373,6 +1383,7 @@ initCountries();
 initFuel();
 </script>
 </div><!-- /page-wrap -->
+<script src="supabase-config.js"></script>
 <script src="common.js"></script>
 </body>
 </html>

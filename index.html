@@ -498,18 +498,21 @@
 </head>
 <body>
 
-<!-- 공지 팝업 — 우측 상단 nav 아래 -->
-<div class="popup-wrap" id="notice-popup">
+<!-- 공지 팝업 — 우측 상단, 최대 5개 순서대로 표시 -->
+<div class="popup-wrap" id="notice-popup" style="display:none;">
   <div class="popup-box">
-    <button class="popup-x" onclick="closePopup()" title="닫기">×</button>
-    <div class="popup-tag">📢 공지사항</div>
+    <button class="popup-x" onclick="popupNext()" title="닫기">×</button>
+    <div class="popup-tag">
+      📢 공지사항 &nbsp;
+      <span id="popup-counter" style="color:var(--muted);font-size:10px;"></span>
+    </div>
     <div class="popup-title" id="popup-title"></div>
     <div class="popup-date" id="popup-date"></div>
     <div class="popup-body" id="popup-body"></div>
     <div class="popup-actions">
       <button class="popup-today" onclick="closePopupToday()">오늘 하루 보지 않기</button>
       <div style="display:flex;gap:6px;">
-        <button class="popup-close" onclick="closePopup()">닫기</button>
+        <button class="popup-close" onclick="popupNext()">닫기</button>
         <a class="popup-more" href="/notices.html">전체보기</a>
       </div>
     </div>
@@ -808,50 +811,100 @@
 })();
 
 
-/* ── 공지 팝업 ── */
+/* ── 공지 팝업 (최대 5개, 게시일 포함 7일간) ── */
+let _popupList = [];
+let _popupIdx  = 0;
+
 (async function(){
   // 오늘 하루 닫기 확인
-  const hideUntil=localStorage.getItem('ab_popup_hide');
-  if(hideUntil && new Date()<new Date(hideUntil)) return;
-  // 세션 내 이미 봤으면 스킵
-  if(sessionStorage.getItem('ab_popup_seen')) return;
+  const hideUntil = localStorage.getItem('ab_popup_hide');
+  if (hideUntil && new Date() < new Date(hideUntil)) return;
 
-  let recentNotice=null;
-  const sevenDaysAgo=new Date(Date.now()-7*24*60*60*1000).toISOString();
+  // 이미 이 세션에서 모두 본 경우 스킵
+  if (sessionStorage.getItem('ab_popup_done')) return;
 
-  try{
-    if(typeof DB!=='undefined'&&DB.ready()){
-      const r=await DB.get('notices',`created_at=gte.${sevenDaysAgo}&order=pinned.desc,created_at.desc&limit=1`);
-      if(r&&r[0]) recentNotice=r[0];
+  // 7일 기준: 게시일(created_at) 포함 7일 = 게시일 00:00:00 기준 +7일
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // 오늘 포함 7일
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+  const cutoff = sevenDaysAgo.toISOString();
+
+  try {
+    if (typeof DB !== 'undefined' && DB.ready()) {
+      const r = await DB.get('notices',
+        `created_at=gte.${cutoff}&order=pinned.desc,created_at.desc&limit=5`
+      );
+      if (r && r.length) _popupList = r;
     } else {
-      // fallback notices.json
-      const r=await fetch('notices.json?t='+Date.now());
-      if(r.ok){
-        const ns=await r.json();
-        const recent=ns.filter(n=>{
-          const d=new Date(n.created_at||n.date||'2000-01-01');
-          return Date.now()-d.getTime()<7*24*60*60*1000;
-        });
-        if(recent.length) recentNotice=recent[0];
+      const r = await fetch('notices.json?t=' + Date.now());
+      if (r.ok) {
+        const ns = await r.json();
+        _popupList = ns.filter(n => {
+          const d = new Date(n.created_at || n.date || '2000-01-01');
+          d.setHours(0, 0, 0, 0);
+          return d >= sevenDaysAgo;
+        }).slice(0, 5);
       }
     }
-  } catch(e){}
+  } catch(e) {}
 
-  if(!recentNotice) return;
+  if (!_popupList.length) return;
 
-  document.getElementById('popup-title').textContent=recentNotice.title;
-  document.getElementById('popup-date').textContent='📅 '+new Date(recentNotice.created_at||recentNotice.date).toLocaleDateString('ko-KR');
-  const body=recentNotice.content||'';
-  document.getElementById('popup-body').textContent=body.length>200?body.slice(0,200)+'...':body;
-  document.getElementById('notice-popup').classList.add('open');
-  sessionStorage.setItem('ab_popup_seen','1');
+  // 이미 본 공지 ID 목록 (오늘 하루 보지 않기 아닌 경우, 세션 내에서만 추적)
+  _popupIdx = 0;
+  showPopupItem(_popupIdx);
 })();
 
-function closePopup(){ document.getElementById('notice-popup').classList.remove('open'); }
-function closePopupToday(){
-  const tomorrow=new Date(); tomorrow.setHours(23,59,59,0);
-  localStorage.setItem('ab_popup_hide',tomorrow.toISOString());
-  closePopup();
+function showPopupItem(idx) {
+  if (idx >= _popupList.length) {
+    // 모두 표시 완료
+    document.getElementById('notice-popup').style.display = 'none';
+    sessionStorage.setItem('ab_popup_done', '1');
+    return;
+  }
+  const n = _popupList[idx];
+  const total = _popupList.length;
+
+  document.getElementById('popup-counter').textContent =
+    total > 1 ? `(${idx+1}/${total})` : '';
+  document.getElementById('popup-title').textContent = n.title;
+
+  const d = new Date(n.created_at || n.date);
+  document.getElementById('popup-date').textContent =
+    '📅 ' + d.toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'});
+
+  const body = n.content || '';
+  document.getElementById('popup-body').textContent =
+    body.length > 180 ? body.slice(0, 180) + '...' : body;
+
+  const wrap = document.getElementById('notice-popup');
+  wrap.style.display = 'block';
+  // 애니메이션 재실행
+  wrap.style.animation = 'none';
+  wrap.offsetHeight; // reflow
+  wrap.style.animation = '';
+}
+
+function popupNext() {
+  _popupIdx++;
+  if (_popupIdx >= _popupList.length) {
+    document.getElementById('notice-popup').style.display = 'none';
+    sessionStorage.setItem('ab_popup_done', '1');
+  } else {
+    showPopupItem(_popupIdx);
+  }
+}
+
+function closePopup() {
+  document.getElementById('notice-popup').style.display = 'none';
+  sessionStorage.setItem('ab_popup_done', '1');
+}
+
+function closePopupToday() {
+  const tomorrow = new Date();
+  tomorrow.setHours(23, 59, 59, 0);
+  localStorage.setItem('ab_popup_hide', tomorrow.toISOString());
+  document.getElementById('notice-popup').style.display = 'none';
 }
 
 /* ── 유류할증료 로드 (fuel.json) ── */
