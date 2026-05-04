@@ -160,6 +160,7 @@
     <div class="mt" id="m-write-title">📝 공지사항 작성</div>
     <div class="mf"><label class="ml">제목</label><input class="mi" id="w-title" type="text" placeholder="제목을 입력하세요"></div>
     <div class="mf"><label class="ml">내용</label><textarea class="mi mi-ta" id="w-body" placeholder="내용을 입력하세요"></textarea></div>
+    <div class="mf"><label class="ml">게시 날짜 <span style="font-size:11px;color:var(--muted);font-weight:400;">(변경 가능)</span></label><input class="mi" id="w-date" type="date"></div>
     <label class="mcheck"><input type="checkbox" id="w-pinned"> 📌 상단 고정 (중요 공지)</label>
     <div class="modal-btns">
       <button class="m-ca" onclick="closeM('m-write')">취소</button>
@@ -283,25 +284,32 @@ function showAdminUI(){
 function openWrite(){
   editId=null; document.getElementById('m-write-title').textContent='📝 공지사항 작성';
   document.getElementById('w-title').value=''; document.getElementById('w-body').value='';
-  document.getElementById('w-pinned').checked=false; openM('m-write');
+  document.getElementById('w-pinned').checked=false;
+  document.getElementById('w-date').value=new Date().toISOString().slice(0,10);
+  openM('m-write');
   setTimeout(()=>document.getElementById('w-title').focus(),100);
 }
 function openEdit(){
   const n=notices.find(x=>x.id===currentId); if(!n) return;
   editId=n.id; document.getElementById('m-write-title').textContent='✏️ 공지사항 수정';
   document.getElementById('w-title').value=n.title; document.getElementById('w-body').value=n.content;
-  document.getElementById('w-pinned').checked=!!n.pinned; openM('m-write');
+  document.getElementById('w-pinned').checked=!!n.pinned;
+  const existDate=(n.created_at||n.date||'').slice(0,10)||new Date().toISOString().slice(0,10);
+  document.getElementById('w-date').value=existDate;
+  openM('m-write');
 }
 async function saveNotice(){
   const title=document.getElementById('w-title').value.trim();
   const content=document.getElementById('w-body').value.trim();
   const pinned=document.getElementById('w-pinned').checked;
+  const dateVal=document.getElementById('w-date').value;
+  const created_at=dateVal ? new Date(dateVal+'T00:00:00+09:00').toISOString() : new Date().toISOString();
   if(!title){alert('제목을 입력해주세요.');return;}
   if(!content){alert('내용을 입력해주세요.');return;}
   if(DB.ready()){
     try{
-      if(editId){ const r=await DB.patch('notices',`id=eq.${editId}`,{title,content,pinned}); const i=notices.findIndex(x=>x.id===editId); if(i>=0&&r[0]) notices[i]={...notices[i],...r[0]}; }
-      else { const r=await DB.post('notices',{title,content,pinned,views:0}); if(r[0]) notices.unshift(r[0]); }
+      if(editId){ const r=await DB.patch('notices',`id=eq.${editId}`,{title,content,pinned,created_at}); const i=notices.findIndex(x=>x.id===editId); if(i>=0&&r[0]) notices[i]={...notices[i],...r[0]}; }
+      else { const r=await DB.post('notices',{title,content,pinned,views:0,created_at}); if(r[0]) notices.unshift(r[0]); }
     } catch(e){ alert('저장 중 오류: '+e.message); return; }
   } else {
     if(editId){ const i=notices.findIndex(x=>x.id===editId); if(i>=0) notices[i]={...notices[i],title,content,pinned}; }
