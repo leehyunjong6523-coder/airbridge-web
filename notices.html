@@ -96,15 +96,17 @@
   display: block;
 }
 
-/* PDF 뷰어 */
-.pdf-viewer-wrap{margin-top:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.pdf-viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
-.pdf-viewer-bar-name{font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:8px;}
+/* PDF 뷰어 — PDF.js 네이티브 렌더링 (브라우저 툴바 없이 자연스럽게) */
+.pdf-viewer-wrap{margin-top:24px;}
+.pdf-viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 14px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.pdf-viewer-bar-name{font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px;}
 .pdf-viewer-bar-btns{display:flex;gap:8px;}
 .pdf-bar-btn{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .2s;}
 .pdf-bar-btn:hover{border-color:var(--cyan);color:var(--cyan);}
-.pdf-iframe{width:100%;height:700px;border:none;display:block;}
-@media(max-width:600px){.pdf-iframe{height:500px;}}
+.pdf-pages{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.pdf-page-canvas{max-width:100%;height:auto;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.35);background:#fff;}
+.pdf-loading{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;}
+.pdf-page-num{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:-8px;}
 </style>
 </head>
 <body>
@@ -232,6 +234,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="supabase-config.js"></script>
 <script src="common.js"></script>
 <script>
@@ -293,8 +296,9 @@ async function showDetail(id){
             + '<a href="'+url+'" download class="pdf-bar-btn">⬇ 다운로드</a>'
           + '</div>'
         + '</div>'
-        + '<iframe class="pdf-iframe" src="'+url+'" title="'+name+'"></iframe>'
+        + '<div class="pdf-pages" id="pdf-pages"><div class="pdf-loading">PDF 불러오는 중...</div></div>'
         + '</div>';
+      renderPdfPages(url);
     } else {
       da.innerHTML = '<a href="'+url+'" target="_blank" rel="noopener" class="attach-pdf">📄 '+name+' 다운로드</a>';
     }
@@ -535,6 +539,54 @@ async function doDelete(){
 function openM(id){ document.getElementById(id).classList.add('open'); }
 function closeM(id){ document.getElementById(id).classList.remove('open'); }
 document.addEventListener('click',e=>{ ['m-login','m-write'].forEach(id=>{ if(e.target===document.getElementById(id)) closeM(id); }); });
+
+// PDF.js로 PDF를 캔버스에 렌더링 (브라우저 기본 뷰어 대신 자연스럽게 표시)
+async function renderPdfPages(url){
+  const container = document.getElementById('pdf-pages');
+  if(!container) return;
+  try{
+    if(typeof pdfjsLib === 'undefined'){
+      container.innerHTML = '<div class="pdf-loading">PDF 뷰어를 불러올 수 없습니다.</div>';
+      return;
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const loadingTask = pdfjsLib.getDocument(url);
+    const pdf = await loadingTask.promise;
+    container.innerHTML = '';
+
+    const containerWidth = container.clientWidth || 700;
+
+    for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++){
+      const page = await pdf.getPage(pageNum);
+      const baseViewport = page.getViewport({ scale: 1 });
+      // 컨테이너 너비에 맞춰 스케일 계산 (고해상도 대응 2x)
+      const scale = (containerWidth / baseViewport.width) * 2;
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'pdf-page-canvas';
+      canvas.style.width = Math.min(containerWidth, baseViewport.width) + 'px';
+      const ctx = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+      container.appendChild(canvas);
+
+      if(pdf.numPages > 1){
+        const pageLabel = document.createElement('div');
+        pageLabel.className = 'pdf-page-num';
+        pageLabel.textContent = pageNum + ' / ' + pdf.numPages;
+        container.appendChild(pageLabel);
+      }
+    }
+  } catch(e){
+    console.warn('PDF 렌더링 오류:', e);
+    container.innerHTML = '<div class="pdf-loading">PDF를 표시할 수 없습니다. 새 탭으로 열어 확인해 주세요.</div>';
+  }
+}
+
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}); }
 init();
