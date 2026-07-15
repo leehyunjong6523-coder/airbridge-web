@@ -446,23 +446,6 @@ document.addEventListener('paste', async function(e){
     }
   }
 });
-      _selectedFile = namedFile;
-      document.getElementById('file-preview-name').textContent = name;
-      document.getElementById('file-preview').classList.add('show');
-      // 미리보기 썸네일
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        document.getElementById('file-preview').innerHTML =
-          '<img src="'+ev.target.result+'" style="height:60px;border-radius:6px;border:1px solid var(--border);">' +
-          '<span class="file-preview-name">'+name+'</span>' +
-          '<button class="file-preview-del" onclick="clearFile()">&#x2715; 제거</button>';
-      };
-      reader.readAsDataURL(namedFile);
-      e.preventDefault();
-      break;
-    }
-  }
-});
 
 function onFileSelect(input){
   const f = input.files[0]; if(!f) return;
