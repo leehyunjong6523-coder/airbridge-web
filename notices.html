@@ -556,20 +556,25 @@ async function renderPdfPages(url){
     container.innerHTML = '';
 
     const containerWidth = container.clientWidth || 700;
+    const dpr = window.devicePixelRatio || 1;
+    // CSS 표시 너비 기준 배율 + 화면 픽셀비율 + 여유 배율(선명도용)
+    const RENDER_MULT = 2.5; // 확대해도 흐려지지 않도록 여유있게 고해상도 렌더링
 
     for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++){
       const page = await pdf.getPage(pageNum);
       const baseViewport = page.getViewport({ scale: 1 });
-      // 컨테이너 너비에 맞춰 스케일 계산 (고해상도 대응 2x)
-      const scale = (containerWidth / baseViewport.width) * 2;
-      const viewport = page.getViewport({ scale });
+      const displayWidth = Math.min(containerWidth, baseViewport.width);
+      const cssScale = displayWidth / baseViewport.width;
+      const renderScale = cssScale * dpr * RENDER_MULT;
+      const viewport = page.getViewport({ scale: renderScale });
 
       const canvas = document.createElement('canvas');
       canvas.className = 'pdf-page-canvas';
-      canvas.style.width = Math.min(containerWidth, baseViewport.width) + 'px';
+      canvas.style.width = displayWidth + 'px';
+      canvas.style.height = (displayWidth * (baseViewport.height / baseViewport.width)) + 'px';
       const ctx = canvas.getContext('2d');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
 
       await page.render({ canvasContext: ctx, viewport: viewport }).promise;
       container.appendChild(canvas);
