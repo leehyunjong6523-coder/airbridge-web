@@ -330,18 +330,18 @@
       <div class="fuel-cards">
         <div class="fuel-card">
           <div class="fuel-carrier" style="color:#ef4444;">● DHL Express</div>
-          <div class="fuel-pct">39.0%</div>
-          <div class="fuel-note">📅 2026-04-08 기준 · 매주 변동</div>
+          <div class="fuel-pct" id="svc-fuel-dhl">-</div>
+          <div class="fuel-note">📅 <span id="svc-fuel-date-dhl">-</span> 기준 · 매주 변동</div>
         </div>
         <div class="fuel-card">
           <div class="fuel-carrier" style="color:#a855f7;">● FedEx</div>
-          <div class="fuel-pct">46.25%</div>
-          <div class="fuel-note">📅 2026-04-08 기준 · 매주 변동</div>
+          <div class="fuel-pct" id="svc-fuel-fedex">-</div>
+          <div class="fuel-note">📅 <span id="svc-fuel-date-fedex">-</span> 기준 · 매주 변동</div>
         </div>
         <div class="fuel-card">
           <div class="fuel-carrier" style="color:#f97316;">● UPS</div>
-          <div class="fuel-pct">46.25%</div>
-          <div class="fuel-note">📅 2026-04-08 기준 · 매주 변동</div>
+          <div class="fuel-pct" id="svc-fuel-ups">-</div>
+          <div class="fuel-note">📅 <span id="svc-fuel-date-ups">-</span> 기준 · 매주 변동</div>
         </div>
       </div>
     </div>
@@ -365,5 +365,24 @@
 
 </div>
 <script src="common.js"></script>
+<script>
+/* ── 유류할증료 로드 (fuel.json) ── */
+(async function(){
+  try{
+    const r = await fetch('fuel.json?t=' + Date.now());
+    const d = await r.json();
+    document.getElementById('svc-fuel-dhl').textContent   = d.dhl   + '%';
+    document.getElementById('svc-fuel-fedex').textContent = d.fedex + '%';
+    document.getElementById('svc-fuel-ups').textContent   = d.ups   + '%';
+    document.getElementById('svc-fuel-date-dhl').textContent   = d.date || '';
+    document.getElementById('svc-fuel-date-fedex').textContent = d.date || '';
+    document.getElementById('svc-fuel-date-ups').textContent   = d.date || '';
+  }catch(e){
+    document.getElementById('svc-fuel-dhl').textContent   = '-';
+    document.getElementById('svc-fuel-fedex').textContent = '-';
+    document.getElementById('svc-fuel-ups').textContent   = '-';
+  }
+})();
+</script>
 </body>
 </html>
