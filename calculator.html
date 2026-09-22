@@ -1291,8 +1291,7 @@ function renderResults(d) {
         <div class="cc-rows">
           <div class="cc-row"><span>공시운임 (기본)</span><span class="cr-val">${fmtKRW(c.r.base)}</span></div>
           <div class="cc-row"><span>할인 후 운임 (${c.r.disc}%)</span><span class="cr-val">${fmtKRW(c.r.pubDisc)}</span></div>
-          <div class="cc-row"><span>유류할증료 (${c.r.fuel}%)</span><span class="cr-val">${fmtKRW(c.r.pubFuel)}</span></div>
-          ${c.r.surTotal > 0 ? `<div class="cc-row"><span>부가서비스 합계</span><span class="cr-val">${fmtKRW(c.r.surTotal + c.r.surFuel)}</span></div>` : ''}
+          <div class="cc-row"><span>유류할증료 (${c.r.fuel}%)</span><span class="cr-val">${fmtKRW(c.r.pubFuel + c.r.surFuel)}</span></div>
         </div>
         ${surRows.length > 0 ? `<div class="cc-surs">${surRows}</div>` : ''}
         <hr class="cc-divider">
