@@ -733,7 +733,7 @@ select.form-control option { background: var(--surface); }
         </div>
       </div>
       <div class="disc-item">
-        <div class="disc-label"><span class="disc-badge disc-fedex"></span>FedEx IP</div>
+        <div class="disc-label"><span class="disc-badge disc-fedex"></span>FedEx Priority</div>
         <div class="disc-input-wrap">
           <input type="number" id="disc-fedex" value="0" min="0" max="80" step="0.5">
           <span class="disc-unit">%</span>
@@ -863,11 +863,118 @@ const UPS_IMP_NDC = {0.5:[134200,135700,145800,165400,155600,161800,172100,21470
 const UPS_IMP_OVER = {"21-44":[21000,22500,23600,30500,31800,42600,48000,62200,63800],"45-70":[21000,22500,23600,30500,31800,42600,45100,62200,63800],"71-99":[19100,20900,22500,29100,30000,41300,42900,61400,62600],"100-299":[19100,20900,22500,28600,30000,41300,42900,61400,62600],"300-499":[17900,19500,21900,27100,29100,40900,42000,59800,56300],"500-999":[17900,19500,21900,27100,29100,40900,42000,59800,56300],"1000+":[17900,19500,21900,27100,29100,40900,42000,59800,56300]};
 
 // FedEx EDS (수출)
-const FEDEX_EDS = {"G":1600,"H":1600,"J":2250};
+const FEDEX_EDS_START = new Date('2026-09-21T00:00:00+09:00'); // FedEx 초과수요 추가요금 시행일
+const FEDEX_EDS_COUNTRY_REGION = {"Albania": "EUROPE", "Algeria": "MEISA2", "American Samoa": "ASIA1", "Andorra": "EUROPE", "Angola": "MEISA2", "Argentina": "USCAMXLAC", "Armenia": "EUROPE", "Australia": "OCEANIA", "Austria": "EUROPE", "Azerbaijan": "EUROPE", "Bahamas": "USCAMXLAC", "Bahrain": "MEISA1", "Bangladesh": "MEISA1", "Belarus": "EUROPE", "Belgium": "EUROPE", "Belize": "USCAMXLAC", "Benin": "MEISA2", "Bhutan": "MEISA1", "Bolivia": "USCAMXLAC", "Brazil": "USCAMXLAC", "Brunei": "ASIA1", "Bulgaria": "EUROPE", "Burkina Faso": "MEISA2", "Burundi": "MEISA2", "Cambodia": "ASIA1", "Cameroon": "MEISA2", "Canada": "USCAMXLAC", "Chile": "USCAMXLAC", "China (People's Republic)": "ASIA1", "Colombia": "USCAMXLAC", "Costa Rica": "USCAMXLAC", "Croatia": "EUROPE", "Cuba": "MEISA2", "Cyprus": "EUROPE", "Czech Republic": "EUROPE", "Denmark": "EUROPE", "Dominican Republic": "USCAMXLAC", "Ecuador": "USCAMXLAC", "Egypt": "MEISA1", "El Salvador": "USCAMXLAC", "Estonia": "EUROPE", "Ethiopia": "MEISA2", "Fiji": "OCEANIA", "Finland": "EUROPE", "France": "EUROPE", "Gabon": "MEISA2", "Georgia": "EUROPE", "Germany": "EUROPE", "Ghana": "MEISA2", "Greece": "EUROPE", "Guatemala": "USCAMXLAC", "Guinea": "MEISA2", "Haiti": "USCAMXLAC", "Honduras": "USCAMXLAC", "Hong Kong SAR China": "ASIA1", "Hungary": "EUROPE", "Iceland": "EUROPE", "India": "INDIA", "Indonesia": "ASIA1", "Iran, Islamic Rep. of": "ETC", "Iraq": "MEISA2", "Ireland": "EUROPE", "Israel": "ISRAEL", "Italy": "EUROPE", "Jamaica": "USCAMXLAC", "Japan": "GUAMJP", "Jordan": "MEISA1", "Kazakhstan": "MEISA2", "Kenya": "MEISA2", "Kuwait": "MEISA1", "Lao P.D.R.": "ASIA1", "Latvia": "EUROPE", "Lebanon": "MEISA2", "Liechtenstein": "EUROPE", "Lithuania": "EUROPE", "Luxembourg": "EUROPE", "Macau SAR China": "ASIA1", "Madagascar": "MEISA2", "Malaysia": "ASIA1", "Maldives": "MEISA1", "Malta": "EUROPE", "Martinique": "USCAMXLAC", "Mauritius": "MEISA2", "Mexico": "USCAMXLAC", "Moldova": "EUROPE", "Monaco": "EUROPE", "Mongolia": "ASIA1", "Montenegro": "EUROPE", "Morocco": "MEISA2", "Mozambique": "MEISA2", "Myanmar": "ETC", "Namibia": "MEISA2", "Nepal": "MEISA1", "Netherlands": "EUROPE", "New Zealand": "OCEANIA", "Nicaragua": "USCAMXLAC", "Niger": "MEISA2", "Nigeria": "MEISA2", "Norway": "EUROPE", "Oman": "MEISA1", "Pakistan": "MEISA2", "Panama": "USCAMXLAC", "Papua New Guinea": "ASIA1", "Paraguay": "USCAMXLAC", "Peru": "USCAMXLAC", "Philippines": "ASIA1", "Poland": "EUROPE", "Portugal": "EUROPE", "Puerto Rico": "USCAMXLAC", "Qatar": "MEISA2", "Romania": "EUROPE", "Russia": "EUROPE", "Rwanda": "MEISA2", "Saudi Arabia": "MEISA1", "Senegal": "MEISA2", "Serbia": "EUROPE", "Singapore": "ASIA1", "Slovakia": "EUROPE", "Slovenia": "EUROPE", "South Africa": "MEISA2", "Spain": "EUROPE", "Sri Lanka": "MEISA1", "Sudan": "ETC", "Sweden": "EUROPE", "Switzerland": "EUROPE", "Syria": "ETC", "Taiwan, China": "ASIA1", "Tanzania": "MEISA2", "Thailand": "ASIA1", "Togo": "MEISA2", "Trinidad and Tobago": "USCAMXLAC", "Tunisia": "MEISA2", "Turkiye": "EUROPE", "Uganda": "MEISA2", "Ukraine": "EUROPE", "United Arab Emirates": "MEISA1", "United Kingdom": "EUROPE", "United States of America": "USCAMXLAC", "Uruguay": "USCAMXLAC", "Uzbekistan": "MEISA1", "Venezuela": "USCAMXLAC", "Vietnam": "VN", "Yemen": "ETC", "Zambia": "MEISA2", "Zimbabwe": "MEISA2"};
+// kg당 요율(KRW) — Priority(IP)/Economy(IE) 구분 필요한 지역은 별도 처리
+const FEDEX_EDS_RATE = {
+  OCEANIA: 720, GUAMJP: 260, VN: 0, ASIA1: 260,
+  ISRAEL: 1870, EUROPE: 1870, INDIA: 160, MEISA1: 2250, MEISA2: 3600, ETC: 0
+};
+const FEDEX_EDS_US_PRIORITY = 2310; // 미국/캐나다/멕시코/LAC — Priority(IP)
+const FEDEX_EDS_US_ECONOMY  = 1730; // 미국/캐나다/멕시코/LAC — Economy(IE)
+const FEDEX_EDS_MIN = 360; // 발송물 당 최소 요금
+function fedexEdsRate(country, isEconomy) {
+  if (new Date() < FEDEX_EDS_START) return 0;
+  const region = FEDEX_EDS_COUNTRY_REGION[country] || 'ETC';
+  if (region === 'USCAMXLAC') return isEconomy ? FEDEX_EDS_US_ECONOMY : FEDEX_EDS_US_PRIORITY;
+  return FEDEX_EDS_RATE[region] || 0;
+}
 // FedEx US 인바운드 처리 수수료
 const FEDEX_US_INBOUND_FEE = 3900;
 // UPS 급증수수료
 const UPS_SURGE = {"Israel":4722,"Bahrain":2004,"Egypt":2004,"Iran, Islamic Rep. of":2004,"Iraq":2004,"Jordan":2004,"Kuwait":2004,"Lebanon":2004,"Oman":2004,"Qatar":2004,"Saudi Arabia":2004,"Syria":2004,"United Arab Emirates":2004,"Yemen":2004};
+// ══════════════════════════════════════════════
+// [2026.09~] 신규 반영 서차지
+// ══════════════════════════════════════════════
+
+// ① DHL 초과수요 추가요금(Demand Surcharge) — 2026.10.01 ~ 2027.02.05, kg당 KRW
+const DHL_DEMAND_START = new Date('2026-10-01T00:00:00+09:00');
+const DHL_DEMAND_END   = new Date('2027-02-05T23:59:59+09:00');
+const DHL_DEMAND_COUNTRY_REGION = {"Albania": "EUROPE", "Algeria": "MENA", "American Samoa": "OCEANIA", "Andorra": "EUROPE", "Angola": "REST", "Argentina": "AMERICAS", "Armenia": "REST", "Australia": "OCEANIA", "Austria": "EUROPE", "Azerbaijan": "REST", "Bahamas": "AMERICAS", "Bahrain": "MENA", "Bangladesh": "SASIA", "Belarus": "REST", "Belgium": "EUROPE", "Belize": "AMERICAS", "Benin": "REST", "Bhutan": "SASIA", "Bolivia": "AMERICAS", "Brazil": "AMERICAS", "Brunei": "OASIA", "Bulgaria": "EUROPE", "Burkina Faso": "REST", "Burundi": "REST", "Cambodia": "OASIA", "Cameroon": "REST", "Canada": "AMERICAS", "Chile": "AMERICAS", "China (People's Republic)": "CNHK", "Colombia": "AMERICAS", "Costa Rica": "AMERICAS", "Croatia": "EUROPE", "Cuba": "REST", "Cyprus": "EUROPE", "Czech Republic": "EUROPE", "Denmark": "EUROPE", "Dominican Republic": "AMERICAS", "Ecuador": "AMERICAS", "Egypt": "MENA", "El Salvador": "AMERICAS", "Estonia": "EUROPE", "Ethiopia": "REST", "Fiji": "OCEANIA", "Finland": "EUROPE", "France": "EUROPE", "Gabon": "REST", "Georgia": "REST", "Germany": "EUROPE", "Ghana": "REST", "Greece": "EUROPE", "Guatemala": "AMERICAS", "Guinea": "REST", "Haiti": "AMERICAS", "Honduras": "AMERICAS", "Hong Kong SAR China": "CNHK", "Hungary": "EUROPE", "Iceland": "EUROPE", "India": "SASIA", "Indonesia": "OASIA", "Iran, Islamic Rep. of": "REST", "Iraq": "REST", "Ireland": "EUROPE", "Israel": "EUROPE", "Italy": "EUROPE", "Jamaica": "AMERICAS", "Japan": "OASIA", "Jordan": "MENA", "Kazakhstan": "REST", "Kenya": "REST", "Kuwait": "MENA", "Lao P.D.R.": "OASIA", "Latvia": "EUROPE", "Lebanon": "MENA", "Liechtenstein": "EUROPE", "Lithuania": "EUROPE", "Luxembourg": "EUROPE", "Macau SAR China": "CNHK", "Madagascar": "REST", "Malaysia": "OASIA", "Maldives": "SASIA", "Malta": "EUROPE", "Martinique": "AMERICAS", "Mauritius": "REST", "Mexico": "AMERICAS", "Moldova": "EUROPE", "Monaco": "EUROPE", "Mongolia": "OASIA", "Montenegro": "EUROPE", "Morocco": "MENA", "Mozambique": "REST", "Myanmar": "OASIA", "Namibia": "REST", "Nepal": "SASIA", "Netherlands": "EUROPE", "New Zealand": "OCEANIA", "Nicaragua": "AMERICAS", "Niger": "REST", "Nigeria": "REST", "Norway": "EUROPE", "Oman": "MENA", "Pakistan": "SASIA", "Panama": "AMERICAS", "Papua New Guinea": "OCEANIA", "Paraguay": "AMERICAS", "Peru": "AMERICAS", "Philippines": "OASIA", "Poland": "EUROPE", "Portugal": "EUROPE", "Puerto Rico": "AMERICAS", "Qatar": "MENA", "Romania": "EUROPE", "Russia": "REST", "Rwanda": "REST", "Saudi Arabia": "MENA", "Senegal": "REST", "Serbia": "EUROPE", "Singapore": "OASIA", "Slovakia": "EUROPE", "Slovenia": "EUROPE", "South Africa": "REST", "Spain": "EUROPE", "Sri Lanka": "SASIA", "Sudan": "REST", "Sweden": "EUROPE", "Switzerland": "EUROPE", "Syria": "REST", "Taiwan, China": "OASIA", "Tanzania": "REST", "Thailand": "OASIA", "Togo": "REST", "Trinidad and Tobago": "AMERICAS", "Tunisia": "MENA", "Turkiye": "EUROPE", "Uganda": "REST", "Ukraine": "REST", "United Arab Emirates": "MENA", "United Kingdom": "EUROPE", "United States of America": "AMERICAS", "Uruguay": "AMERICAS", "Uzbekistan": "REST", "Venezuela": "REST", "Vietnam": "OASIA", "Yemen": "REST", "Zambia": "REST", "Zimbabwe": "REST"};
+// 행: 출발지 지역 / 열: 도착지 지역 (수출 시 한국=이외아시아지역 고정, 수입 시 도착지=아시아 고정)
+const DHL_DEMAND_MATRIX = {
+  CNHK:    {CNHK:200, ASIA:200, OCEANIA:900, EUROPE:3300, AMERICAS:3500, MENA:2700, REST:1500},
+  SASIA:   {CNHK:200, ASIA:200, OCEANIA:900, EUROPE:2000, AMERICAS:2500, MENA:900,  REST:1500},
+  OASIA:   {CNHK:200, ASIA:200, OCEANIA:900, EUROPE:2200, AMERICAS:2600, MENA:2100, REST:1500},
+  EUROPE:  {CNHK:0,   ASIA:0,   OCEANIA:900, EUROPE:500,  AMERICAS:900,  MENA:0,    REST:1500},
+  AMERICAS:{CNHK:0,   ASIA:0,   OCEANIA:900, EUROPE:0,    AMERICAS:500,  MENA:0,    REST:1500},
+  MENA:    {CNHK:0,   ASIA:0,   OCEANIA:900, EUROPE:2000, AMERICAS:2400, MENA:200,  REST:1500},
+  REST:    {CNHK:1500,ASIA:1500,OCEANIA:1500,EUROPE:1500, AMERICAS:1500, MENA:1500, REST:1500}
+};
+// 도착지 지역 계산 시 SASIA/OASIA/OCEANIA는 목적지 컬럼에서 'ASIA' 또는 'OCEANIA'로 통합
+function dhlDemandDestRegion(region) {
+  if (region === 'SASIA' || region === 'OASIA') return 'ASIA';
+  return region; // CNHK, OCEANIA, EUROPE, AMERICAS, MENA, REST 그대로
+}
+function dhlDemandSurcharge(country, wtKg) {
+  const now = new Date();
+  if (now < DHL_DEMAND_START || now > DHL_DEMAND_END) return 0; // 기간 외 미적용
+  const originRegion = 'OASIA'; // 한국 = 이외아시아지역(수출 기준)
+  const destRegion = dhlDemandDestRegion(DHL_DEMAND_COUNTRY_REGION[country] || 'REST');
+  const perKg = (DHL_DEMAND_MATRIX[originRegion] && DHL_DEMAND_MATRIX[originRegion][destRegion]) || 0;
+  return perKg * wtKg;
+}
+
+// ② FedEx 비표준 화물 초과수요 추가요금 — 2026.09.21부터 시행, 패키지당 KRW 7,200
+const FEDEX_NONSTD_START = new Date('2026-09-21T00:00:00+09:00');
+const FEDEX_NONSTD_FEE = 7200;
+
+// ③ UPS 급증 긴급 수수료(Surge Emergency Fee) — 한국 출발(수출) 기준, kg당 KRW, 기간별 지역 요율
+// [Table B: 아시아태평양 출발지→글로벌 도착지 수출 화물 기준]
+// 2026.09.27 ~ 2027.02.06 (최신 기간)
+const UPS_SURGE_P2_START = new Date('2026-09-27T00:00:00+09:00');
+const UPS_SURGE_P2_END   = new Date('2027-02-06T23:59:59+09:00');
+const UPS_SURGE_P2 = { ISMEA:1720, EUROPE:1720, AMERICAS:2430, ASIAPAC:140, OCEANIA:140, REST:2430 };
+// 2026.07.05 ~ 2026.09.26
+const UPS_SURGE_P1_START = new Date('2026-07-05T00:00:00+09:00');
+const UPS_SURGE_P1_END   = new Date('2026-09-26T23:59:59+09:00');
+const UPS_SURGE_P1 = { UAEISR:4722, MIDEAST:4220, EUROPE:430, AMERICAS:720, ASIAPAC:143, ISMEA:430, REST:720 };
+
+// ── Period1(07.05~09.26) 국가 그룹 ──
+const UPS_SURGE_UAE_ISR = new Set(["United Arab Emirates", "Israel"]);
+const UPS_SURGE_P1_MIDEAST = new Set(["Bahrain", "Bangladesh", "Egypt", "Iraq", "Jordan", "Kuwait", "Lebanon", "Nepal", "Oman", "Pakistan", "Qatar", "Saudi Arabia", "Sri Lanka"]);
+const UPS_SURGE_P1_EUROPE = new Set(["Albania", "Andorra", "Armenia", "Austria", "Belarus", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Malta", "Moldova", "Monaco", "Montenegro", "Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkiye", "Ukraine", "United Kingdom"]);
+const UPS_SURGE_P1_AMERICAS = new Set(["United States of America", "Canada", "Mexico", "Puerto Rico", "Argentina", "Bahamas", "Belize", "Bolivia", "Brazil", "Chile", "Colombia", "Costa Rica", "Dominican Republic", "Ecuador", "El Salvador", "Guatemala", "Haiti", "Honduras", "Jamaica", "Martinique", "Nicaragua", "Panama", "Paraguay", "Peru", "Trinidad and Tobago", "Uruguay", "Venezuela"]);
+const UPS_SURGE_P1_ASIAPAC = new Set(["American Samoa", "Australia", "Brunei", "Cambodia", "China (People's Republic)", "Hong Kong SAR China", "India", "Indonesia", "Japan", "Lao P.D.R.", "Malaysia", "Myanmar", "Mongolia", "Macau SAR China", "New Zealand", "Papua New Guinea", "Philippines", "Singapore", "Thailand", "Taiwan, China", "Vietnam"]);
+const UPS_SURGE_P1_RESTISMEA = new Set(["Angola", "Azerbaijan", "Burkina Faso", "Burundi", "Benin", "Cameroon", "Algeria", "Ethiopia", "Gabon", "Ghana", "Guinea", "Kenya", "Kazakhstan", "Madagascar", "Morocco", "Mauritius", "Maldives", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Senegal", "Tunisia", "Tanzania", "Uganda", "Uzbekistan", "Yemen", "South Africa", "Zambia", "Zimbabwe"]);
+
+// ── Period2(09.27~2027.02.06) 국가 그룹 ──
+const UPS_SURGE_P2_ISMEA = new Set(["Algeria", "Angola", "Azerbaijan", "Bahrain", "Bangladesh", "Benin", "Burkina Faso", "Burundi", "Cameroon", "Egypt", "Ethiopia", "Gabon", "Ghana", "Guinea", "Iraq", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Lebanon", "Madagascar", "Maldives", "Mauritius", "Morocco", "Mozambique", "Namibia", "Nepal", "Niger", "Nigeria", "Oman", "Tunisia", "Rwanda", "Saudi Arabia", "Sri Lanka", "Senegal", "South Africa", "Tanzania", "Togo", "United Arab Emirates", "Uganda", "Uzbekistan", "Yemen", "Zambia", "Zimbabwe", "Pakistan", "Qatar"]);
+const UPS_SURGE_P2_EUROPE = new Set(["Albania", "Andorra", "Armenia", "Austria", "Belarus", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Israel", "Italy", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Malta", "Moldova", "Monaco", "Montenegro", "Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkiye", "Ukraine", "United Kingdom"]);
+const UPS_SURGE_P2_AMERICAS = new Set(["United States of America", "Canada", "Mexico", "Puerto Rico", "Argentina", "Bahamas", "Belize", "Bolivia", "Brazil", "Chile", "Colombia", "Costa Rica", "Dominican Republic", "Ecuador", "El Salvador", "Guatemala", "Haiti", "Honduras", "Jamaica", "Martinique", "Nicaragua", "Panama", "Paraguay", "Peru", "Trinidad and Tobago", "Uruguay", "Venezuela"]);
+const UPS_SURGE_P2_ASIAPAC = new Set(["American Samoa", "Brunei", "Cambodia", "China (People's Republic)", "Hong Kong SAR China", "India", "Indonesia", "Japan", "Lao P.D.R.", "Malaysia", "Myanmar", "Mongolia", "Macau SAR China", "Papua New Guinea", "Philippines", "Singapore", "Thailand", "Taiwan, China", "Vietnam"]);
+const UPS_SURGE_P2_OCEANIA = new Set(["Australia", "New Zealand"]);
+
+function upsSurgeRegionP1(country) {
+  if (UPS_SURGE_UAE_ISR.has(country))     return 'UAEISR';
+  if (UPS_SURGE_P1_MIDEAST.has(country))  return 'MIDEAST';
+  if (UPS_SURGE_P1_EUROPE.has(country))   return 'EUROPE';
+  if (UPS_SURGE_P1_AMERICAS.has(country)) return 'AMERICAS';
+  if (UPS_SURGE_P1_ASIAPAC.has(country))  return 'ASIAPAC';
+  if (UPS_SURGE_P1_RESTISMEA.has(country))return 'ISMEA';
+  return 'REST';
+}
+function upsSurgeRegionP2(country) {
+  if (UPS_SURGE_P2_EUROPE.has(country))   return 'EUROPE';  // Israel 포함
+  if (UPS_SURGE_P2_ISMEA.has(country))    return 'ISMEA';
+  if (UPS_SURGE_P2_AMERICAS.has(country)) return 'AMERICAS';
+  if (UPS_SURGE_P2_OCEANIA.has(country))  return 'OCEANIA';
+  if (UPS_SURGE_P2_ASIAPAC.has(country))  return 'ASIAPAC';
+  return 'REST';
+}
+function upsSurgeFee(country, wtKg) {
+  const now = new Date();
+  if (now >= UPS_SURGE_P2_START && now <= UPS_SURGE_P2_END) {
+    const region = upsSurgeRegionP2(country);
+    return (UPS_SURGE_P2[region] || 0) * wtKg;
+  }
+  if (now >= UPS_SURGE_P1_START && now <= UPS_SURGE_P1_END) {
+    const region = upsSurgeRegionP1(country);
+    return (UPS_SURGE_P1[region] || 0) * wtKg;
+  }
+  return 0; // 기간 외 미적용
+}
+
 // DHL 소요일 (Zone 1~8)
 const DHL_DAYS = [1,2,3,4,5,5,6,7];
 // FedEx 소요일 (Zone A~J)
@@ -1058,16 +1165,32 @@ function calculate() {
   const upsNoService   = UPS_NO_SERVICE.has(country);
   const fedexNoService = FEDEX_NO_SERVICE.has(country);
 
-  // ── FedEx EDS (수출) ──
+  // ── FedEx 초과수요 추가요금(EDS) — 2026.09.21 시행, 서비스별(IP/Economy) 요율 상이 ──
+  let edsIP = 0, edsEc = 0;
   if (!imp) {
-    const eds = (FEDEX_EDS[fxZone] || 0) * wtFedEx;
-    if (eds > 0) surs.fedex['초과수요(EDS)'] = ceil10(eds);
+    const rateIP = fedexEdsRate(country, false); // Priority(IP) 요율
+    const rateEc = fedexEdsRate(country, true);  // Economy(IE) 요율
+    if (rateIP > 0 || rateEc > 0) {
+      edsIP = Math.max(ceil10(rateIP * wtFedEx), rateIP > 0 ? FEDEX_EDS_MIN : 0);
+      edsEc = Math.max(ceil10(rateEc * wtFedEx), rateEc > 0 ? FEDEX_EDS_MIN : 0);
+    }
     if (country === 'United States of America' || country === 'Canada') {
       surs.fedex['미국 인바운드 처리'] = FEDEX_US_INBOUND_FEE;
     }
-    // UPS 급증수수료
-    const surgePer = UPS_SURGE[country] || 0;
-    if (surgePer > 0) surs.ups['급증 수수료'] = ceil10(surgePer * wtUPS);
+    // UPS 급증 긴급 수수료 (기간별 지역 요율 자동 적용)
+    const surgeAmt = upsSurgeFee(country, wtUPS);
+    if (surgeAmt > 0) surs.ups['급증 긴급수수료'] = ceil10(surgeAmt);
+  }
+
+  // ── DHL 초과수요 추가요금 (2026.10.01~2027.02.05 자동 적용) ──
+  const dhlDemandAmt = dhlDemandSurcharge(country, wtDHL);
+  if (dhlDemandAmt > 0) surs.dhl['초과수요 추가요금'] = ceil10(dhlDemandAmt);
+
+  // ── FedEx 비표준 화물 초과수요 추가요금 (2026.09.21~ 자동 적용) ──
+  // 이미 특대형/추가취급(용적,중량) 등 비표준 사유가 발생한 건에 한해 부과
+  if (new Date() >= FEDEX_NONSTD_START) {
+    const isNonStd = surs.fedex['특대형'] || surs.fedex['추가취급(중량)'] || surs.fedex['추가취급(용적)'];
+    if (isNonStd) surs.fedex['비표준화물 초과수요'] = FEDEX_NONSTD_FEE;
   }
 
   // ── Base rates ──
@@ -1086,9 +1209,14 @@ function calculate() {
     return { base, pubDisc, pubFuel, surTotal, surFuel, total, surs: surMap, disc, fuel, wt };
   }
 
+  const surFedexIP = {...surs.fedex};
+  const surFedexEc = {...surs.fedex};
+  if (edsIP > 0) surFedexIP['초과수요(EDS)'] = edsIP;
+  if (edsEc > 0) surFedexEc['초과수요(EDS)'] = edsEc;
+
   const rDHL    = buildCarrier('DHL Express',   baseDHL,   discDHL,    FUEL.dhl,   {...surs.dhl},   wtDHL);
-  const rFxIP   = buildCarrier('FedEx IP',      baseFxIP,  discFedex,  FUEL.fedex, {...surs.fedex}, wtFedEx);
-  const rFxEc   = buildCarrier('FedEx Economy', baseFxEc,  discFedexE, FUEL.fedex, {...surs.fedex}, wtFedEx);
+  const rFxIP   = buildCarrier('FedEx Priority',      baseFxIP,  discFedex,  FUEL.fedex, surFedexIP,      wtFedEx);
+  const rFxEc   = buildCarrier('FedEx Economy', baseFxEc,  discFedexE, FUEL.fedex, surFedexEc,      wtFedEx);
   const rUPS    = buildCarrier('UPS Saver',     baseUPS,   discUPS,    FUEL.ups,   {...surs.ups},   wtUPS);
 
   // ── Find best price ──
@@ -1134,7 +1262,7 @@ function renderResults(d) {
 
   const cards = [
     { id:'dhl',    cls:'dhl-card',     r:d.rDHL,   name:'DHL Express',   zone:`Zone ${d.dhlZone}`,  days:DHL_DAYS[d.dhlZone-1],        noSvc:false,            color:'var(--dhl-col)' },
-    { id:'fedex',  cls:'fedex-card',   r:d.rFxIP,  name:'FedEx IP',      zone:`Zone ${d.fxZone}`,   days:FEDEX_DAYS_IP[FEDEX_ZONES_LIST.indexOf(d.fxZone)],  noSvc:d.fedexNoService, color:'var(--fedex-col)' },
+    { id:'fedex',  cls:'fedex-card',   r:d.rFxIP,  name:'FedEx Priority',      zone:`Zone ${d.fxZone}`,   days:FEDEX_DAYS_IP[FEDEX_ZONES_LIST.indexOf(d.fxZone)],  noSvc:d.fedexNoService, color:'var(--fedex-col)' },
     { id:'fedex-e',cls:'fedex-e-card', r:d.rFxEc,  name:'FedEx Economy', zone:`Zone ${d.fxZone}`,   days:FEDEX_DAYS_ECON[FEDEX_ZONES_LIST.indexOf(d.fxZone)],noSvc:d.fedexNoService, color:'#c084fc' },
     { id:'ups',    cls:'ups-card',     r:d.rUPS,   name:'UPS Saver',     zone:`Zone ${d.upsZone}`,  days:UPS_DAYS[d.upsZone-1],        noSvc:d.upsNoService,   color:'var(--ups-col)' },
   ];
