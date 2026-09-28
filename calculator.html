@@ -683,6 +683,12 @@ select.form-control option { background: var(--surface); }
           <div class="country-dropdown" id="country-dropdown"></div>
           <input type="hidden" id="dest-country">
         </div>
+        <!-- 중국/미국 FedEx Zone 세부 판별용 우편번호 -->
+        <div id="fedex-zip-wrap" style="display:none;margin-top:10px;">
+          <label class="form-label" id="fedex-zip-label" style="font-size:11px;">우편번호 (FedEx Zone 정확한 산정)</label>
+          <input type="text" class="form-control" id="fedex-zip" placeholder="예: 90210" oninput="calcFedexZoneHint()">
+          <div id="fedex-zip-hint" style="font-size:11px;color:var(--cyan);margin-top:4px;"></div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">수출 / 수입</label>
@@ -1156,7 +1162,9 @@ function calculate() {
   const dhlZone = DHL_ZONE_MAP[country] || 5;
   const dhlZi   = dhlZone - 1;
 
-  const fxZone = FEDEX_ZONE_MAP_EN[country] || 'F';
+  const fedexZip = document.getElementById('fedex-zip')?.value.trim() || '';
+  const fxZoneOverride = getFedexZoneOverride(country, fedexZip);
+  const fxZone = fxZoneOverride || FEDEX_ZONE_MAP_EN[country] || 'F';
   const fxZi   = FEDEX_ZONES_LIST.indexOf(fxZone);
 
   const upsZone = imp ? (UPS_IMP_ZONE_MAP[country]||5) : (UPS_ZONE_MAP[country]||5);
@@ -1435,6 +1443,58 @@ function selectCountry(en) {
   document.getElementById('country-search').value = kr + ' (' + en + ')';
   document.getElementById('country-dropdown').classList.remove('open');
   document.getElementById('country-clear').style.display = 'flex';
+  toggleFedexZipInput(en);
+}
+
+// ── FedEx Zone 세부 판별: 중국(성/시), 미국(서부 우편번호) ──
+function toggleFedexZipInput(en) {
+  const wrap  = document.getElementById('fedex-zip-wrap');
+  const label = document.getElementById('fedex-zip-label');
+  const input = document.getElementById('fedex-zip');
+  input.value = '';
+  document.getElementById('fedex-zip-hint').textContent = '';
+  if (en === "China (People's Republic)") {
+    wrap.style.display = 'block';
+    label.textContent = '우편번호 (중국 — 푸젠·광둥성은 Zone A, 그 외 지역은 Zone C)';
+  } else if (en === 'United States of America') {
+    wrap.style.display = 'block';
+    label.textContent = '우편번호 (미국 — 서부 8개주는 Zone E, 그 외 지역은 Zone F)';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function calcFedexZoneHint() {
+  const en  = selectedCountryEN;
+  const zip = document.getElementById('fedex-zip').value.trim();
+  const hint = document.getElementById('fedex-zip-hint');
+  const zone = getFedexZoneOverride(en, zip);
+  if (!zip) { hint.textContent = ''; return; }
+  hint.textContent = zone ? `→ FedEx Zone ${zone} 적용` : '→ 판별 불가(기본 Zone 적용)';
+}
+
+// 우편번호로 FedEx Zone 재산정 (중국/미국 세부 구분)
+function getFedexZoneOverride(en, zip) {
+  const z = parseInt((zip || '').replace(/\D/g, ''), 10);
+  if (en === "China (People's Republic)") {
+    if (!z) return 'C'; // 미입력 시 기본 Zone C (중국 대부분 지역)
+    if (z >= 350000 && z <= 369999) return 'A'; // 푸젠성
+    if (z >= 510000 && z <= 529999) return 'A'; // 광둥성
+    return 'C';
+  }
+  if (en === 'United States of America') {
+    if (!z) return 'F'; // 미입력 시 기본 Zone F
+    if (z >= 80000 && z <= 81699) return 'E'; // Colorado
+    if (z >= 83200 && z <= 83999) return 'E'; // Idaho
+    if (z >= 84000 && z <= 84799) return 'E'; // Utah
+    if (z >= 85000 && z <= 86599) return 'E'; // Arizona
+    if (z >= 89000 && z <= 89899) return 'E'; // Nevada
+    if (z >= 90000 && z <= 96699) return 'E'; // California
+    if (z >= 97000 && z <= 97999) return 'E'; // Oregon
+    if (z >= 98000 && z <= 99499) return 'E'; // Washington
+    return 'F';
+  }
+  return null;
 }
 
 function clearCountry() {
