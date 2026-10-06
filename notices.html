@@ -242,9 +242,17 @@ const ADMIN_ID='admin', ADMIN_PW='a12345';
 let isAdmin=false, notices=[], editId=null, currentId=null;
 
 async function init(){
-  if(!DB.ready()){ document.getElementById('db-warn').style.display='block'; await loadFallback(); return; }
+  if(!DB.ready()){ document.getElementById('db-warn').style.display='block'; await loadFallback(); openFromQuery(); return; }
   if(sessionStorage.getItem('ab_admin')==='1'){ isAdmin=true; showAdminUI(); }
   await loadNotices();
+  openFromQuery();
+}
+// 외부 링크(예: 광고 팝업)에서 ?id=123 형태로 들어오면 해당 공지를 바로 열어줌
+function openFromQuery(){
+  const qid = new URLSearchParams(location.search).get('id');
+  if(!qid) return;
+  const idNum = parseInt(qid, 10);
+  if(!isNaN(idNum) && notices.some(x=>x.id===idNum)) showDetail(idNum);
 }
 async function loadNotices(){
   try{ notices=await DB.get('notices','order=pinned.desc,created_at.desc'); renderList(); }
