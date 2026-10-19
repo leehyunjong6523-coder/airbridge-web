@@ -28,6 +28,9 @@
     <li><a href="/contact.html">문의/오시는길</a></li>
   </ul>
   <a href="tel:032-502-1880" class="nav-links nav-cta">📞 032-502-1880</a>
+  <a href="https://portal.airbridge.kr/" target="_blank" rel="nofollow noopener" class="nav-portal" title="직원 전용">
+    <span class="nav-portal-icon">🔒</span>사내망
+  </a>
   <div class="nav-ham" id="nav-ham" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
   </div>
@@ -41,6 +44,7 @@
   <a href="/calculator.html">운임계산기</a>
   <a href="/contact.html">문의/오시는길</a>
   <a href="tel:032-502-1880" class="nav-cta">📞 032-502-1880</a>
+  <a href="https://portal.airbridge.kr/" target="_blank" rel="nofollow noopener" class="nav-portal-mobile">🔒 사내망 (직원 전용)</a>
 </div>`;
 
   // ── FOOTER HTML ──
@@ -133,45 +137,4 @@
     const nav = document.getElementById('main-nav');
     if (nav) nav.style.borderBottomColor = window.scrollY > 20 ? 'var(--border)' : 'transparent';
   });
-})();
-/* ===== 사내네트워크 링크 (직원용 포털 입구) =====
-   common.js 맨 아래에 그대로 붙여넣으세요. 모든 페이지의 푸터 맨 아래에 작은 링크가 생깁니다.
-   - 주소를 바꾸려면 PORTAL_URL 만 고치세요.
-   - 링크를 없애려면 이 블록 전체를 지우면 됩니다. */
-(function () {
-  var PORTAL_URL = 'https://portal.airbridge.kr/';
-  var LINK_ID = 'staff-portal-link';
-
-  function addStaffLink() {
-    if (document.getElementById(LINK_ID)) return;           // 이미 있으면 다시 만들지 않음
-
-    var wrap = document.createElement('div');
-    wrap.id = LINK_ID;
-    wrap.style.cssText = 'text-align:center;padding:12px 16px 20px;font-size:12px;';
-
-    var a = document.createElement('a');
-    a.href = PORTAL_URL;
-    a.textContent = '사내네트워크';
-    a.title = '직원 전용';
-    a.target = '_blank';
-    a.rel = 'nofollow noopener';
-    a.style.cssText = 'color:inherit;opacity:.5;text-decoration:none;border-bottom:1px dotted currentColor;';
-    a.onmouseover = function () { a.style.opacity = '1'; };
-    a.onmouseout = function () { a.style.opacity = '.5'; };
-
-    wrap.appendChild(a);
-    var footer = document.querySelector('footer') || document.getElementById('footer');
-    (footer || document.body).appendChild(wrap);
-  }
-
-  function run() {
-    addStaffLink();
-    setTimeout(addStaffLink, 1500);   // 푸터가 늦게 그려지는 경우를 대비해 한 번 더 확인
-  }
-
-  if (document.readyState === 'complete') {
-    run();
-  } else {
-    window.addEventListener('load', run);
-  }
 })();
