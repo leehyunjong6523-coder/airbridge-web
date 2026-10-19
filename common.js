@@ -29,7 +29,7 @@
   </ul>
   <a href="tel:032-502-1880" class="nav-links nav-cta">📞 032-502-1880</a>
   <a href="https://portal.airbridge.kr/" target="_blank" rel="nofollow noopener" class="nav-portal" title="직원 전용">
-    <span class="nav-portal-icon">🔒</span>사내망
+    <span class="nav-portal-icon">🔒</span>직원용
   </a>
   <div class="nav-ham" id="nav-ham" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
