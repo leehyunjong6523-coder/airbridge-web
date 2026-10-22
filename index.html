@@ -883,7 +883,14 @@
   list.forEach(function(n, idx) {
     const d = new Date(n.created_at || n.date);
     const dateStr = d.toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'});
-    const body = (n.content || '');
+    // 공지 본문은 HTML(편집기 innerHTML)로 저장되므로, 태그를 제거한 순수 텍스트로 변환해 미리보기 생성
+    const body = (function (html) {
+      const withBreaks = String(html || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(div|p|li|h[1-6]|tr)>/gi, '\n');
+      const text = new DOMParser().parseFromString(withBreaks, 'text/html').body.textContent || '';
+      return text.replace(/ /g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+    })(n.content);
     const bodyShort = body.length > 120 ? body.slice(0, 120) + '...' : body;
     const itemId = 'popup-item-' + idx;
 
